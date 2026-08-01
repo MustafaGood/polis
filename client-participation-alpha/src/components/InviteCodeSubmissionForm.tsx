@@ -92,43 +92,63 @@ export default function InviteCodeSubmissionForm({
           </div>
         ) : null}
 
-        <div className="invite-code-submission-form-container">
-          <input
-            type="text"
-            dir="ltr"
-            inputMode="text"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            autoComplete="one-time-code"
-            value={inviteCode}
-            onChange={(e) => setInviteCode(e.target.value)}
-            placeholder={s.invite_code_prompt}
-          />
-          <button disabled={!inviteCode || submittingInvite} onClick={handleAcceptInvite}>
-            {submittingInvite ? s.submitting : s.submit_invite_code}
-          </button>
-        </div>
+        <form
+          className="invite-code-field"
+          onSubmit={(e) => {
+            e.preventDefault()
+            void handleAcceptInvite()
+          }}
+        >
+          <label htmlFor="invite-code-input">{s.invite_code_prompt}</label>
+          <div className="invite-code-submission-form-container">
+            <input
+              id="invite-code-input"
+              type="text"
+              dir="ltr"
+              inputMode="text"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              autoComplete="one-time-code"
+              value={inviteCode}
+              onChange={(e) => setInviteCode(e.target.value)}
+              aria-invalid={!!error}
+            />
+            <button type="submit" disabled={!inviteCode || submittingInvite}>
+              {submittingInvite ? s.submitting : s.submit_invite_code}
+            </button>
+          </div>
+        </form>
 
         <div className="or-separator">{s.or_text}</div>
 
-        <div className="invite-code-submission-form-container">
-          <input
-            type="text"
-            dir="ltr"
-            inputMode="text"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            autoComplete="one-time-code"
-            value={loginCode}
-            onChange={(e) => setLoginCode(e.target.value)}
-            placeholder={s.login_code_prompt}
-          />
-          <button disabled={!loginCode || submittingLogin} onClick={handleLoginWithCode}>
-            {submittingLogin ? s.submitting : s.submit_login_code}
-          </button>
-        </div>
+        <form
+          className="invite-code-field"
+          onSubmit={(e) => {
+            e.preventDefault()
+            void handleLoginWithCode()
+          }}
+        >
+          <label htmlFor="login-code-input">{s.login_code_prompt}</label>
+          <div className="invite-code-submission-form-container">
+            <input
+              id="login-code-input"
+              type="text"
+              dir="ltr"
+              inputMode="text"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              autoComplete="one-time-code"
+              value={loginCode}
+              onChange={(e) => setLoginCode(e.target.value)}
+              aria-invalid={!!error}
+            />
+            <button type="submit" disabled={!loginCode || submittingLogin}>
+              {submittingLogin ? s.submitting : s.submit_login_code}
+            </button>
+          </div>
+        </form>
       </div>
     </>
   )
@@ -155,6 +175,19 @@ const invite_code_css = `
   font-size: 0.9rem;
   color: #555;
   margin-bottom: 16px;
+}
+
+/* Field group: visible label + input/button row */
+.invite-code-field {
+  margin-bottom: 0;
+}
+
+.invite-code-field label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 6px;
 }
 
 /* Flex container for the input and button */

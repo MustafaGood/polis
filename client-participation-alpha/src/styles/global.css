@@ -155,13 +155,28 @@ h1 {
 }
 .submit-form {
   display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.submit-form-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.submit-form-controls {
+  display: flex;
   width: 100%;
   align-items: stretch;
   justify-content: space-between;
 }
 
 @media (max-width: 650px) {
-  .submit-form {
+  .submit-form-controls {
     flex-direction: column;
 
     button {
