@@ -78,5 +78,5 @@ SELECT oidc_sub, uid, created FROM oidc_user_mappings ORDER BY created DESC LIMI
 - [x] Minimal PoC (OIDC-knapp + AuthProvider + connector)
 - [x] Dokumentera env-byten (simulator → Idura)
 - [x] Testplan för mentor
-- [ ] Uppdatera tavlan + länka PR/branch
+- [x] Uppdatera tavlan + länka PR/branch — https://github.com/MustafaGood/polis/pull/6
 - [x] Kort demo (2026-08-18): knappen → oidc-simulator → `test.user.0@polis.test` → Signed in as …
