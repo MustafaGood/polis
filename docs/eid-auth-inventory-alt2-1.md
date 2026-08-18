@@ -3,7 +3,9 @@
 **Författare:** Mustafa Salahuddin  
 **Spår:** Alternativ 2 / Spår A — BankID & Freja eID (OIDC-broker)  
 **Datum:** 2026-08-18  
-**Branch:** `feature/eid-auth-inventory`
+**Status:** Klar (Alt 2.1)  
+**Branch:** `feature/eid-auth-inventory`  
+**Commit:** `9b64e48b1`
 
 ## Syfte
 
