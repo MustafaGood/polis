@@ -90,11 +90,27 @@ function hasBadWords(txt: string) {
   return false;
 }
 
-const managementClient = new ManagementClient({
-  domain: Config.authDomain!,
-  clientId: Config.authClientId!,
-  clientSecret: Config.authClientSecret!,
-});
+function isLocalOidcBroker(): boolean {
+  const domain = Config.authDomain || "";
+  const issuer = Config.authIssuer || "";
+  return (
+    Config.isDevMode ||
+    domain.includes("localhost") ||
+    domain.includes("127.0.0.1") ||
+    issuer.includes("localhost") ||
+    issuer.includes("127.0.0.1")
+  );
+}
+
+// Auth0 Management API is only meaningful against a real Auth0 tenant.
+// Local oidc-simulator has no Management API — calling it causes fetch failures.
+const managementClient = isLocalOidcBroker()
+  ? null
+  : new ManagementClient({
+      domain: Config.authDomain!,
+      clientId: Config.authClientId!,
+      clientSecret: Config.authClientSecret!,
+    });
 
 async function commentExists(zid: number, txt: string): Promise<boolean> {
   const rows = (await pg.queryP(
@@ -252,6 +268,9 @@ interface CommentModerationResult {
 }
 
 export async function isProConvo(owner: number): Promise<boolean> {
+  if (!managementClient) {
+    return false;
+  }
   try {
     const { email } = await getUserInfoForUid2(owner);
     if (!email) {

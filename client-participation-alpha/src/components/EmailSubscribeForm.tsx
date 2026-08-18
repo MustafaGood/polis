@@ -11,7 +11,7 @@ const subscribeAPI = async (email: string, conversation_id: string) => {
   return await subscribeToNotifications({
     email,
     conversation_id,
-    frequency: 1
+    type: 1
   })
 }
 

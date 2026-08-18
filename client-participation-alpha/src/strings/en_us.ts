@@ -135,6 +135,9 @@ const s: Translations = {
   // ─────────────────────────────────────────────────────────────
   // Authentication / XID
   // ─────────────────────────────────────────────────────────────
+  oidcSignIn: "Sign in with OIDC (eID PoC)",
+  oidcSignOut: "Sign out",
+  oidcSignedInAs: "Signed in as {{email}}",
   xidOidcConflictWarning:
     "Warning: You are currently signed-in to polis, but have opened a conversation with an XID token. To participate with an XID, please log out of your polis account.",
   xidRequired:

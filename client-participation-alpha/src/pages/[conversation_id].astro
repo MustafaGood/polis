@@ -10,6 +10,7 @@ import TopicAgenda from '../components/topicAgenda/TopicAgenda'
 import TreeviteInvites from '../components/TreeviteInvites'
 import TreeviteLoginCodeModal from '../components/TreeviteLoginCodeModal'
 import VisualizationContainer from '../components/VisualizationContainer'
+import OidcAuthIsland from '../components/OidcAuthIsland'
 import XidOidcConflictWarning from '../components/XidOidcConflictWarning'
 import PolisLogo from '../components/icons/PolisLogo'
 import Layout from '../pages/layouts/Layout.astro'
@@ -149,6 +150,7 @@ const hideHeader = Astro.url.searchParams.get('hide_header');
   <div class="container">
     {hideHeader ? null : <Header />}
     
+    <OidcAuthIsland client:only="react" s={s as Translations} />
     <XidOidcConflictWarning client:load s={s as Translations} />
 
     {fetchError ? (

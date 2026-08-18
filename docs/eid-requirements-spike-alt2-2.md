@@ -4,7 +4,7 @@
 **Efter:** Alt 2.1 inventering (`docs/eid-auth-inventory-alt2-1.md`)  
 **Branch:** `feature/eid-requirements-spike`  
 **Datum:** 2026-08-18  
-**Status:** Klar för mentor-avstämning (Idura-sandbox fortfarande blocker)
+**Status:** Klar (docs). Öppen punkt: Idura-bekräftelse från mentor. Mock-PoC (Alt 2.3) kan startas nu.
 
 ## Mål
 
