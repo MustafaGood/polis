@@ -55,6 +55,9 @@ export interface Translations {
   notificationsGetNotified: string
   notificationsSubscribeButton: string
   notificationsSubscribeErrorGeneric: string
+  oidcSignIn: string
+  oidcSignOut: string
+  oidcSignedInAs: string
   ok_got_it: string
   oops: string
   opinionGroups: string
