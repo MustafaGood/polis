@@ -24,7 +24,7 @@ const s: Translations = {
   couldNotLoadConversation:
     "Could not load this conversation. Error: {{error}}. Please check the ID and try again.",
   participantHelpWelcomeText:
-    "Welcome to a new kind of conversation — <b>vote</b> on other people’s statements — <b>the more the better</b>.",
+    "Welcome to a new kind of conversation <b>vote</b> on other people’s statements <b>the more the better</b>.",
   signInToParticipate: "You need to sign in to participate.",
 
   // ─────────────────────────────────────────────────────────────
@@ -64,9 +64,9 @@ const s: Translations = {
   submitComment: "Submit",
   tipCommentsRandom:
     "Statements are displayed randomly and you are not replying directly to other people’s statements: <b>you are adding a stand-alone statement.</b>",
-  writePrompt: "Share your perspective (you are not replying — submit a stand-alone statement)",
+  writePrompt: "Share your perspective (you are not replying submit a stand-alone statement)",
   writeCommentHelpText:
-    "Are your perspectives or experiences missing from the conversation? If so, <b>add them</b> in the box below — <b>one at a time</b>.",
+    "Are your perspectives or experiences missing from the conversation? If so, <b>add them</b> in the box below <b>one at a time</b>.",
 
   // ─────────────────────────────────────────────────────────────
   // Visualization
@@ -97,7 +97,7 @@ const s: Translations = {
   // ─────────────────────────────────────────────────────────────
   download_invites_csv: "Download CSV",
   invite_code_accepted_message:
-    "Invite accepted. Your login code is: {{login_code}}. Treat this code like a password — save it in a secure place. You must use it to log in again later. It cannot be re-issued if lost.",
+    "Invite accepted. Your login code is: {{login_code}}. Treat this code like a password save it in a secure place. You must use it to log in again later. It cannot be re-issued if lost.",
   invite_code_accepted_message_no_code: "Invite accepted.",
   invite_code_invalid: "The provided invite code was invalid. Please try again.",
   invite_code_prompt: "Enter Invite Code",

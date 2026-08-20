@@ -49,7 +49,7 @@ s.tipCommentsRandom =
   "Izjave se prikazuju nasumično i ne odgovarate direktno na izjave drugih osoba: <b>dodajete samostalnu izjavu.</b>"
 s.writePrompt = "Podijelite mišljenje (ne dajete odgovor, nego samostalnu izjavu)"
 s.writeCommentHelpText =
-  "Nedostaju li u razgovoru vaši stavovi ili iskustva? Ako nedostaju, <b>dodajte ih</b> u okvir u nastavku — <b>pojedinačno</b>."
+  "Nedostaju li u razgovoru vaši stavovi ili iskustva? Ako nedostaju, <b>dodajte ih</b> u okvir u nastavku <b>pojedinačno</b>."
 
 // ─────────────────────────────────────────────────────────────
 // Visualization

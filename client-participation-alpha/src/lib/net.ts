@@ -1,6 +1,7 @@
 import {
   getConversationIdFromUrl,
   getConversationToken,
+  getParticipantJwt,
   getXidFromUrl,
   getXNameFromUrl,
   getXProfileImageUrlFromUrl,
@@ -129,10 +130,12 @@ const getAccessTokenSilentlySPA = async (options?: {
 const handleAuthError = (error: PolisApiError, response: Response): PolisApiError => {
   if (response && (response.status === 401 || response.status === 403)) {
     console.warn('Authentication/authorization error:', response.status)
-    // For 401 (unauthorized), try to redirect to login
+    // For 401 (unauthorized), try to redirect to login only when no participant JWT exists.
+    // OIDC PoC tokens are not Polis participant JWTs; redirecting on those 401s loops login.
     if (response.status === 401) {
-      // Check if we should force signout
-      if (oidcLoginRedirect && typeof oidcLoginRedirect === 'function') {
+      const conversationId = getConversationIdFromUrl()
+      const hasParticipantJwt = conversationId ? !!getParticipantJwt(conversationId) : false
+      if (!hasParticipantJwt && oidcLoginRedirect && typeof oidcLoginRedirect === 'function') {
         oidcLoginRedirect()
         return error
       }
@@ -200,25 +203,23 @@ async function polisFetch<T = unknown>(
   }
 
   try {
-    // First try OIDC token
-    const oidcToken = await getAccessTokenSilentlySPA()
-    if (oidcToken) {
-      headers.Authorization = `Bearer ${oidcToken}`
+    // Prefer Polis participant JWT for API calls. OIDC access tokens from
+    // oidc-simulator/Idura are not accepted by /votes, /comments, /convSubscriptions.
+    let conversationId: string | null = null
+    if (data && typeof data.conversation_id === 'string') {
+      conversationId = data.conversation_id
+    } else if (typeof window !== 'undefined') {
+      conversationId = getConversationIdFromUrl()
+    }
+
+    const participantJwt = conversationId ? getParticipantJwt(conversationId) : null
+    if (participantJwt) {
+      headers.Authorization = `Bearer ${participantJwt}`
     } else {
-      // Fall back to conversation-specific JWT if available
-      // Extract conversation_id from data or current URL path
-      let conversationId: string | null = null
-
-      // First check if conversation_id is in the request data
-      // Use type narrowing safely
-      if (data && typeof data.conversation_id === 'string') {
-        conversationId = data.conversation_id
-      } else if (typeof window !== 'undefined') {
-        // Try to extract from current page URL path using shared helper
-        conversationId = getConversationIdFromUrl()
-      }
-
-      if (conversationId) {
+      const oidcToken = await getAccessTokenSilentlySPA()
+      if (oidcToken) {
+        headers.Authorization = `Bearer ${oidcToken}`
+      } else if (conversationId) {
         const conversationToken = getConversationToken(conversationId)
         if (conversationToken && conversationToken.token) {
           headers.Authorization = `Bearer ${conversationToken.token}`
@@ -367,19 +368,22 @@ async function downloadCsv(
     Accept: 'text/csv'
   }
 
-  // Authorization: prefer OIDC access token, fall back to conversation JWT
+  // Authorization: prefer participant JWT, then OIDC
   try {
-    const oidcToken = await getAccessTokenSilentlySPA()
-    if (oidcToken) {
-      headers.Authorization = `Bearer ${oidcToken}`
+    let conversationId: string | null = null
+    if (data && typeof data.conversation_id === 'string') {
+      conversationId = data.conversation_id
+    } else if (typeof window !== 'undefined') {
+      conversationId = getConversationIdFromUrl()
+    }
+    const participantJwt = conversationId ? getParticipantJwt(conversationId) : null
+    if (participantJwt) {
+      headers.Authorization = `Bearer ${participantJwt}`
     } else {
-      let conversationId: string | null = null
-      if (data && typeof data.conversation_id === 'string') {
-        conversationId = data.conversation_id
-      } else if (typeof window !== 'undefined') {
-        conversationId = getConversationIdFromUrl()
-      }
-      if (conversationId) {
+      const oidcToken = await getAccessTokenSilentlySPA()
+      if (oidcToken) {
+        headers.Authorization = `Bearer ${oidcToken}`
+      } else if (conversationId) {
         const conversationToken = getConversationToken(conversationId)
         if (conversationToken && conversationToken.token) {
           headers.Authorization = `Bearer ${conversationToken.token}`

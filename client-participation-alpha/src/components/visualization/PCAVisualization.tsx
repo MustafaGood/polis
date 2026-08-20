@@ -185,7 +185,7 @@ export default function PCAVisualization({
           {isConsensusSelected
             ? s.consensus
             : `${s.group_123} ${groupLetters[selectedGroup!] ?? selectedGroup}`}
-          {selectedStatement ? ` — ${s.comment_123} ${selectedStatement.tid}` : null}
+          {selectedStatement ? ` ${s.comment_123} ${selectedStatement.tid}` : null}
         </p>
       )}
 

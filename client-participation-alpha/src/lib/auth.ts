@@ -126,6 +126,17 @@ function _getJwtPayload(key: string) {
   }
 }
 
+/**
+ * Participant JWT only (never OIDC). Used for votes/comments/subscribe:
+ * Polis server expects conversation JWT, not broker access tokens.
+ */
+export function getParticipantJwt(conversation_id: string): string | null {
+  if (typeof window === 'undefined') {
+    return null
+  }
+  return localStorage.getItem(`participant_token_${conversation_id}`)
+}
+
 export function getConversationToken(conversation_id: string) {
   if (typeof window === 'undefined') {
     return null

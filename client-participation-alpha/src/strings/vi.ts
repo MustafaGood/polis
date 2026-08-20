@@ -49,7 +49,7 @@ s.submitComment = "Gửi"
 s.tipCommentsRandom =
   "Ý kiến sẽ xuất hiện ngẫu nhiên. Bạn không trực tiếp phản hồi ý kiến của người khác, <b>mà cần phát biểu ý kiến độc lập.</b>"
 s.writePrompt =
-  "Chia sẻ quan điểm của bạn (phần này không phải để phản hồi ý kiến của người khác — hãy gửi ý kiến độc lập)"
+  "Chia sẻ quan điểm của bạn (phần này không phải để phản hồi ý kiến của người khác hãy gửi ý kiến độc lập)"
 s.writeCommentHelpText =
   "Có phải quan điểm hoặc trải nghiệm của bạn chưa có trong nội dung thảo luận? Nếu đúng vậy, <b>hãy thêm ý kiến</b> vào ô bên dưới – <b>mỗi lần một câu</b>."
 

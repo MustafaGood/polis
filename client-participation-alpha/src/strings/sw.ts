@@ -47,9 +47,9 @@ s.helpWriteListStandalone = "Wazo linalojitegemea"
 s.submitComment = "Tuma"
 s.tipCommentsRandom =
   " Kauli zinaonyeshwa kwa unasibu na hazijibu moja kwa moja kauli za watu wengine: <b>unaweka kauli inayojitegemea.</b>"
-s.writePrompt = "Eleza mtazamo wako (kauli unayoweka si jibu — tuma kauli inayojitegemea)"
+s.writePrompt = "Eleza mtazamo wako (kauli unayoweka si jibu tuma kauli inayojitegemea)"
 s.writeCommentHelpText =
-  "Je, mtazamo au hali ulizopitia hazipo kwenye mazungumzo? Ikiwa ndivyo, <b>waweke</b> kupitia kisanduku kilicho hapa chini — <b>mmoja baada ya mwingine</b>."
+  "Je, mtazamo au hali ulizopitia hazipo kwenye mazungumzo? Ikiwa ndivyo, <b>waweke</b> kupitia kisanduku kilicho hapa chini <b>mmoja baada ya mwingine</b>."
 
 // ─────────────────────────────────────────────────────────────
 // Visualization
