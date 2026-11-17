@@ -7,6 +7,7 @@ import {
   getXProfileImageUrlFromUrl,
   handleJwtFromResponse
 } from './auth'
+import { fetchWithEidFallback } from './eidRequest'
 
 // Simplified service base resolution (both env vars are required)
 const SERVICE_BASE: string =
@@ -202,6 +203,7 @@ async function polisFetch<T = unknown>(
     body = JSON.stringify(enrichedData)
   }
 
+  let usingParticipantJwt = false
   try {
     // Prefer Polis participant JWT for API calls. OIDC access tokens from
     // oidc-simulator/Idura are not accepted by /votes, /comments, /convSubscriptions.
@@ -215,6 +217,7 @@ async function polisFetch<T = unknown>(
     const participantJwt = conversationId ? getParticipantJwt(conversationId) : null
     if (participantJwt) {
       headers.Authorization = `Bearer ${participantJwt}`
+      usingParticipantJwt = true
     } else {
       const oidcToken = await getAccessTokenSilentlySPA()
       if (oidcToken) {
@@ -244,12 +247,12 @@ async function polisFetch<T = unknown>(
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
   let response: Response
   try {
-    response = await fetch(url, {
+    response = await fetchWithEidFallback(url, {
       method: method,
       headers: headers,
       body: body,
       signal: controller.signal
-    })
+    }, usingParticipantJwt ? getAccessTokenSilentlySPA : undefined)
   } catch (err: unknown) {
     const error = err as Error & { status?: number }
     if (error && error.name === 'AbortError') {

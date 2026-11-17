@@ -1,28 +1,37 @@
 import { AuthProvider } from 'react-oidc-context'
 import { WebStorageStateStore, type User } from 'oidc-client-ts'
+import { CriiptoVerifyProvider } from '@criipto/verify-react'
 import type { Translations } from '../strings/types'
 import OidcConnector from './OidcConnector'
 import ParticipantOidcLogin from './ParticipantOidcLogin'
+import IduraConnector from './IduraConnector'
+import ParticipantIduraLogin from './ParticipantIduraLogin'
+import IduraCallback from './IduraCallback'
+import {
+  getIduraDomain,
+  getParticipantRedirectUri,
+  isIduraIssuer,
+  isOidcLoginEnabled
+} from '../lib/idura'
+import {
+  getIduraRedirectUri,
+  IDURA_CALLBACK_PATH
+} from '../lib/iduraRedirect'
 
 interface OidcAuthIslandProps {
   s: Translations
 }
 
-function isOidcLoginEnabled(): boolean {
-  const flag = import.meta.env.PUBLIC_ENABLE_OIDC_LOGIN
-  return flag === 'true' || flag === '1'
-}
-
-function getOidcConfig() {
+function getSimulatorOidcConfig() {
   const authority = import.meta.env.PUBLIC_AUTH_ISSUER
   const clientId = import.meta.env.PUBLIC_AUTH_CLIENT_ID
   const audience = import.meta.env.PUBLIC_AUTH_AUDIENCE
 
-  if (!authority || !clientId || !audience) {
+  if (!authority || !clientId) {
     return null
   }
 
-  const redirectUri = `${window.location.origin}${window.location.pathname}`
+  const redirectUri = getParticipantRedirectUri()
 
   return {
     authority,
@@ -31,30 +40,62 @@ function getOidcConfig() {
     post_logout_redirect_uri: redirectUri,
     scope: 'openid profile email',
     userStore: new WebStorageStateStore({ store: window.localStorage }),
-    extraQueryParams: { audience },
+    ...(audience ? { extraQueryParams: { audience } } : {}),
     onSigninCallback: (user: User | void) => {
       const state = user?.state as { returnTo?: string } | undefined
       const returnTo = state?.returnTo || window.location.pathname
-      // Restore pre-login path (without OIDC ?code=&state= callback params).
       window.history.replaceState({}, document.title, returnTo)
     }
   }
 }
 
 /**
- * Client-only island: enables participant OIDC when PUBLIC_ENABLE_OIDC_LOGIN is set
- * and AUTH_* public env vars are present (simulator today, Idura later).
+ * Participant auth island:
+ * - Idura issuer → @criipto/verify-react (BankID/Freja method selector)
+ * - Other issuers (oidc-simulator) → react-oidc-context
  */
 export default function OidcAuthIsland({ s }: OidcAuthIslandProps) {
   if (!isOidcLoginEnabled()) {
     return null
   }
 
-  const oidcConfig = getOidcConfig()
-  if (!oidcConfig) {
+  const issuer = import.meta.env.PUBLIC_AUTH_ISSUER
+  const clientId = import.meta.env.PUBLIC_AUTH_CLIENT_ID
+
+  if (!issuer || !clientId) {
     console.warn(
-      '[OIDC PoC] PUBLIC_ENABLE_OIDC_LOGIN is on but PUBLIC_AUTH_ISSUER / CLIENT_ID / AUDIENCE are incomplete'
+      '[OIDC PoC] PUBLIC_ENABLE_OIDC_LOGIN is on but PUBLIC_AUTH_ISSUER / CLIENT_ID are incomplete'
     )
+    return null
+  }
+
+  if (isIduraIssuer(issuer)) {
+    const domain = getIduraDomain(issuer)
+    if (!domain) {
+      console.warn('[OIDC PoC] Could not parse Idura domain from PUBLIC_AUTH_ISSUER')
+      return null
+    }
+
+    return (
+      <CriiptoVerifyProvider
+        domain={domain}
+        clientID={clientId}
+        redirectUri={getIduraRedirectUri()}
+        sessionStore={window.sessionStorage}>
+        {window.location.pathname.replace(/\/$/, '') === IDURA_CALLBACK_PATH ? (
+          <IduraCallback s={s} />
+        ) : (
+          <>
+            <IduraConnector />
+            <ParticipantIduraLogin s={s} />
+          </>
+        )}
+      </CriiptoVerifyProvider>
+    )
+  }
+
+  const oidcConfig = getSimulatorOidcConfig()
+  if (!oidcConfig) {
     return null
   }
 

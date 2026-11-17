@@ -135,9 +135,17 @@ const s: Translations = {
   // ─────────────────────────────────────────────────────────────
   // Authentication / XID
   // ─────────────────────────────────────────────────────────────
-  oidcSignIn: "Sign in with OIDC (eID PoC)",
+  oidcSignIn: "Sign in with BankID or Freja (eID PoC)",
   oidcSignOut: "Sign out",
   oidcSignedInAs: "Signed in as {{email}}",
+  oidcLoginCanceled:
+    "Sign-in was canceled in BankID/Freja. You can try again when ready.",
+  oidcTryAgain: "Try again",
+  oidcLoginFailed: "Sign-in failed. Please try again.",
+  oidcLoginFrejaUnavailable:
+    "Freja is temporarily unavailable (Idura could not reach Freja). Try BankID, or wait a few minutes and try Freja again.",
+  eidRequired:
+    "This conversation requires BankID or Freja. Sign in with eID to participate.",
   xidOidcConflictWarning:
     "Warning: You are currently signed-in to polis, but have opened a conversation with an XID token. To participate with an XID, please log out of your polis account.",
   xidRequired:

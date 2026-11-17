@@ -84,6 +84,8 @@ try {
   // Handle specific error cases
   if (errorResponseText.includes('polis_err_xid_required')) {
     fetchError = s.xidRequired
+  } else if (errorResponseText.includes('polis_err_eid_required')) {
+    fetchError = s.eidRequired
   } else {
     fetchError = s.couldNotLoadConversation.replace('{{error}}', errorMessage)
   }

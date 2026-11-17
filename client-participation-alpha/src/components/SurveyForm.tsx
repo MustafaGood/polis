@@ -90,6 +90,8 @@ export default function SurveyForm({
         errorMessage = s.xidRequired
       } else if (errorText.includes('polis_err_xid_not_allowed')) {
         errorMessage = s.xidRequired
+      } else if (errorText.includes('polis_err_eid_required')) {
+        errorMessage = s.eidRequired
       }
 
       setError(errorMessage)
