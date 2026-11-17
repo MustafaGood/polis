@@ -28,6 +28,7 @@ import { issueAnonymousJWT } from "./anonymous-jwt";
 import { issueStandardUserJWT } from "./standard-user-jwt";
 import { issueXidJWT } from "./xid-jwt";
 import { RequestWithP } from "../d";
+import { assertEidRequired, getRequestEidAcr } from "./eid";
 import logger from "../utils/logger";
 import pg from "../db/pg-query";
 
@@ -64,6 +65,12 @@ interface EnsureParticipantOptions {
    * Default: true
    */
   issueJWT?: boolean;
+
+  /**
+   * Whether to enforce a conversation's eID requirement.
+   * Defaults to createIfMissing.
+   */
+  requireEid?: boolean;
 
   /**
    * Property name to store the participant info in req.p
@@ -327,7 +334,18 @@ async function _issueJWTIfNeeded(
 
     if (req.p.oidc_sub) {
       // Standard user with OIDC authentication
-      token = issueStandardUserJWT(req.p.oidc_sub, conversationId, uid, pid);
+      const eidAcr = getRequestEidAcr(
+        req.p.oidcUser?.acr,
+        req.p.eidAcr,
+        !!req.p.jwt_conversation_mismatch
+      );
+      token = issueStandardUserJWT(
+        req.p.oidc_sub,
+        conversationId,
+        uid,
+        pid,
+        eidAcr
+      );
       tokenType = "StandardUser";
     } else if (req.p.xid) {
       // XID participant
@@ -361,7 +379,12 @@ async function _ensureParticipantInternal(
   req: RequestWithP,
   options: EnsureParticipantOptions = {}
 ): Promise<ParticipantCreationResult> {
-  const { createIfMissing = true, issueJWT = true, assigner } = options;
+  const {
+    createIfMissing = true,
+    issueJWT = true,
+    requireEid = createIfMissing,
+    assigner,
+  } = options;
 
   // Try to get zid from conversation_id if not already present
   let zid = req.p.zid;
@@ -378,6 +401,20 @@ async function _ensureParticipantInternal(
 
   if (!zid) {
     throw new Error("polis_err_missing_zid");
+  }
+
+  if (requireEid) {
+    const conversationRows = (await pg.queryP_readOnly(
+      "SELECT eid_required FROM conversations WHERE zid = ($1);",
+      [zid]
+    )) as { eid_required: boolean }[];
+    const eidRequired = !!conversationRows?.[0]?.eid_required;
+    const eidAcr = getRequestEidAcr(
+      req.p.oidcUser?.acr,
+      req.p.eidAcr,
+      !!req.p.jwt_conversation_mismatch
+    );
+    assertEidRequired(eidRequired, eidAcr);
   }
 
   let uid = req.p.uid;
@@ -603,6 +640,13 @@ export function ensureParticipant(options: EnsureParticipantOptions = {}) {
         error.message === "polis_err_xid_not_allowed"
       ) {
         return failJson(res, 403, "polis_err_xid_not_allowed");
+      }
+
+      if (
+        error instanceof Error &&
+        error.message === "polis_err_eid_required"
+      ) {
+        return failJson(res, 403, "polis_err_eid_required");
       }
 
       // Handle Treevite authentication errors with proper status code

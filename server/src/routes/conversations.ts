@@ -36,6 +36,7 @@ import {
   isPolisDev,
   isUserAllowedToCreateConversations,
 } from "../utils/common";
+import { hasEidXidPolicyConflict } from "../auth/eid";
 
 function failWithRetryRequest(res: {
   setHeader: (arg0: string, arg1: number) => void;
@@ -847,6 +848,7 @@ function handle_PUT_conversations(
       conversation_id: string;
       context: any;
       use_xid_whitelist?: any;
+      eid_required?: boolean;
       topics_enabled?: any;
     };
   },
@@ -958,13 +960,47 @@ function handle_PUT_conversations(
       if (!_.isUndefined(req.p.use_xid_whitelist)) {
         fields.use_xid_whitelist = !!req.p.use_xid_whitelist;
       }
+      if (!_.isUndefined(req.p.eid_required)) {
+        fields.eid_required = !!req.p.eid_required;
+      }
 
       const q = sql_conversations
         .update(fields)
         .where(sql_conversations.zid.equals(req.p.zid))
         // .and( sql_conversations.owner.equals(req.p.uid) )
         .returning("*");
-      verifyMetaPromise.then(
+      const policyValidationPromise =
+        !_.isUndefined(req.p.eid_required) ||
+        !_.isUndefined((req.p as any).xid_required) ||
+        !_.isUndefined(req.p.use_xid_whitelist)
+          ? getConversationInfo(req.p.zid).then((currentConversation) => {
+              const eidRequired = _.isUndefined(req.p.eid_required)
+                ? !!currentConversation.eid_required
+                : !!req.p.eid_required;
+              const xidRequired = _.isUndefined(
+                (req.p as any).xid_required
+              )
+                ? !!currentConversation.xid_required
+                : !!(req.p as any).xid_required;
+              const useXidWhitelist = _.isUndefined(
+                req.p.use_xid_whitelist
+              )
+                ? !!currentConversation.use_xid_whitelist
+                : !!req.p.use_xid_whitelist;
+
+              if (
+                hasEidXidPolicyConflict(
+                  eidRequired,
+                  xidRequired,
+                  useXidWhitelist
+                )
+              ) {
+                throw new Error("polis_err_eid_xid_conflict");
+              }
+            })
+          : Promise.resolve();
+
+      verifyMetaPromise.then(() => policyValidationPromise).then(
         function () {
           pg.query(q.toString(), function (err: any, result: { rows: any[] }) {
             if (err) {
@@ -1032,7 +1068,14 @@ function handle_PUT_conversations(
           });
         },
         function (err: { message: any }) {
-          failJson(res, 500, err.message, err);
+          const isPolicyConflict =
+            err.message === "polis_err_eid_xid_conflict";
+          failJson(
+            res,
+            isPolicyConflict ? 400 : 500,
+            err.message,
+            err
+          );
         }
       );
     })

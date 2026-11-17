@@ -31,14 +31,16 @@ export function issueStandardUserJWT(
   oidcSub: string,
   conversationId: string,
   uid: number,
-  pid: number
+  pid: number,
+  eidAcr?: string
 ): string {
   return issueParticipantJWT(
     "standard_user",
     conversationId,
     uid,
     pid,
-    oidcSub
+    oidcSub,
+    eidAcr
   );
 }
 

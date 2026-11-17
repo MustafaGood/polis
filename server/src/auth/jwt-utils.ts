@@ -40,6 +40,7 @@ export interface XidJwtClaims extends BaseParticipantJwtClaims {
 export interface StandardUserJwtClaims extends BaseParticipantJwtClaims {
   oidc_sub: string;
   standard_user_participant: boolean;
+  eid_acr?: string;
 }
 
 export type ParticipantJwtClaims =
@@ -152,14 +153,16 @@ export function issueParticipantJWT(
   conversationId: string,
   uid: number,
   pid: number,
-  oidcSub: string
+  oidcSub: string,
+  eidAcr?: string
 ): string;
 export function issueParticipantJWT(
   participantType: "anonymous" | "xid" | "standard_user",
   conversationId: string,
   uid: number,
   pid: number,
-  identifier?: string
+  identifier?: string,
+  eidAcr?: string
 ): string {
   const basePayload = {
     aud: Config.polisJwtAudience as string,
@@ -200,6 +203,7 @@ export function issueParticipantJWT(
         sub: `user:${identifier}`,
         oidc_sub: identifier,
         standard_user_participant: true,
+        ...(eidAcr ? { eid_acr: eidAcr } : {}),
       } as StandardUserJwtClaims;
       break;
 
@@ -303,6 +307,9 @@ export function createExtractUserMiddleware(
         req.p.xid = payload.xid;
       } else if (participantType === "standard_user" && payload.oidc_sub) {
         req.p.oidc_sub = payload.oidc_sub;
+        if (typeof payload.eid_acr === "string") {
+          req.p.eidAcr = payload.eid_acr;
+        }
       }
 
       // Set conversation mismatch flag

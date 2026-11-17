@@ -146,6 +146,8 @@ export interface ConversationInfo {
   owner: number;
   org_id?: number;
   use_xid_whitelist?: boolean;
+  xid_required?: boolean;
+  eid_required?: boolean;
   is_active?: boolean;
   is_anon?: boolean;
   is_draft?: boolean;
@@ -237,6 +239,7 @@ export type ConversationType = {
   zid?: number;
   use_xid_whitelist?: boolean;
   xid_required?: boolean;
+  eid_required?: boolean;
   uid?: number;
   context?: string;
   xid?: string;
@@ -266,6 +269,7 @@ export interface RequestWithP extends Omit<ExpressRequest, "p"> {
     // Authentication-related
     oidc_sub?: string;
     oidcUser?: any;
+    eidAcr?: string;
     jwt_conversation_mismatch?: boolean;
     jwt_conversation_id?: string;
     jwt_xid?: string;

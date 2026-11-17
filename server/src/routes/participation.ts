@@ -21,6 +21,7 @@ import {
   updateLastInteractionTimeForConversation,
   getOneConversation,
 } from "../server-helpers";
+import { assertEidRequired, getRequestEidAcr } from "../auth/eid";
 
 // basic defaultdict implementation
 function DD(this: any, f: () => { votes: number; comments: number }) {
@@ -113,6 +114,9 @@ function handle_POST_participants(
       answers: any;
       parent_url: any;
       referrer: any;
+      oidcUser?: { acr?: unknown };
+      eidAcr?: string;
+      jwt_conversation_mismatch?: boolean;
     };
   },
   res: ExpressResponse
@@ -158,34 +162,57 @@ function handle_POST_participants(
     );
   }
 
-  // Check if already in the conversation
-  _getParticipant(zid, req.p.uid)
+  const eidAcr = getRequestEidAcr(
+    req.p.oidcUser?.acr,
+    req.p.eidAcr,
+    !!req.p.jwt_conversation_mismatch
+  );
+
+  getConversationInfo(zid)
     .then(
-      function (ptpt: { pid: number }) {
-        if (ptpt) {
-          finish(ptpt);
-          addExtendedParticipantInfo(zid, req.p.uid, info);
-          return;
+      function (conversation) {
+        try {
+          assertEidRequired(!!conversation.eid_required, eidAcr);
+        } catch (error) {
+          if (error instanceof Error && error.message === "polis_err_eid_required") {
+            failJson(res, 403, error.message, error);
+            return;
+          }
+          throw error;
         }
 
-        getConversationInfo(zid)
-          .then(function () {
-            doJoin();
-          })
+        return _getParticipant(zid, req.p.uid)
+          .then(
+            function (ptpt: { pid: number }) {
+              if (ptpt) {
+                finish(ptpt);
+                addExtendedParticipantInfo(zid, req.p.uid, info);
+                return;
+              }
+              doJoin();
+            },
+            function (err: any) {
+              failJson(res, 500, "polis_err_post_participants_db_err", err);
+            }
+          )
           .catch(function (err: any) {
-            failJson(
-              res,
-              500,
-              "polis_err_post_participants_need_uid_to_check_lti_users_4",
-              err
-            );
+            failJson(res, 500, "polis_err_post_participants_misc", err);
           });
       },
       function (err: any) {
-        failJson(res, 500, "polis_err_post_participants_db_err", err);
+        failJson(
+          res,
+          500,
+          "polis_err_post_participants_need_uid_to_check_lti_users_4",
+          err
+        );
       }
     )
     .catch(function (err: any) {
+      if (err?.message === "polis_err_eid_required") {
+        failJson(res, 403, "polis_err_eid_required", err);
+        return;
+      }
       failJson(res, 500, "polis_err_post_participants_misc", err);
     });
 }

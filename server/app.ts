@@ -1095,7 +1095,11 @@ helpersInitialized.then(
         getConversationIdFetchZid,
         assignToPCustom("zid")
       ),
-      ensureParticipant({ createIfMissing: false, issueJWT: false }),
+      ensureParticipant({
+        createIfMissing: false,
+        issueJWT: false,
+        requireEid: true,
+      }),
       handle_PUT_topicAgenda_selections
     );
 
@@ -1108,7 +1112,11 @@ helpersInitialized.then(
         getConversationIdFetchZid,
         assignToPCustom("zid")
       ),
-      ensureParticipant({ createIfMissing: false, issueJWT: false }),
+      ensureParticipant({
+        createIfMissing: false,
+        issueJWT: false,
+        requireEid: true,
+      }),
       handle_DELETE_topicAgenda_selections
     );
 
@@ -1399,6 +1407,7 @@ helpersInitialized.then(
       want("topics_enabled", getBool, assignToP, false),
       want("use_xid_whitelist", getBool, assignToP),
       want("xid_required", getBool, assignToP),
+      want("eid_required", getBool, assignToP),
       handle_PUT_conversations
     );
 
