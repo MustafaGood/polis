@@ -42,7 +42,7 @@ s.commentSent =
   "တင်ပြချက် ပို့လိုက်ပါပြီ။ အခြားပါဝင်သူများသာ သင့်တင်ပြချက်အပြင် သဘောတူ/မတူကို မြင်ပါမည်။"
 s.helpWriteListIntro = "ဘယ်အရာက တင်ပြချက်ကောင်း ဖြစ်စေသလဲ။"
 s.helpWriteListRaisNew = "အမြင်၊ အတွေ့အကြုံ (သို့) ပြဿနာ အသစ်"
-s.helpWriteListShort = "ရှင်းလင်းတိကျသော အသုံးအနှုန်း (စာလုံးရေ ၁၄၀ အထိ ကန့်သတ်ထားသည်)"
+s.helpWriteListShort = "ရှင်းလင်းတိကျသော အသုံးအနှုန်း (စာလုံးရေ ၄၀၀ အထိ ကန့်သတ်ထားသည်)"
 s.helpWriteListStandalone = "သီးသန့်စိတ်ကူး"
 s.submitComment = "ပို့ရန်"
 s.tipCommentsRandom =

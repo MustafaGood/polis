@@ -41,7 +41,7 @@ s.commentSent =
   "Висловлювання подане на розгляд! Тільки інші учасники побачать ваше висловлювання, та погодяться чи не погодяться з ним."
 s.helpWriteListIntro = "З чого складається гарне висловлювання?"
 s.helpWriteListRaisNew = "Розкриває нові точки зору, досвіди або проблеми"
-s.helpWriteListShort = "Чітке та стисле (не більше 140 символів)"
+s.helpWriteListShort = "Чітке та стисле (не більше 400 символів)"
 s.helpWriteListStandalone = "Окрема ідея"
 s.submitComment = "Надіслати"
 s.tipCommentsRandom =

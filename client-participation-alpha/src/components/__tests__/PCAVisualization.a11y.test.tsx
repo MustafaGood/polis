@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import type { PCAData } from '../../api/types'
-import { a11yStrings } from '../../test-utils/a11y'
+import { a11yStrings, expectNoA11yViolations } from '../../test-utils/a11y'
 
 jest.mock('../../lib/auth', () => ({
   getConversationToken: jest.fn()
@@ -71,5 +71,44 @@ describe('PCA visualization accessibility', () => {
     screen.getByRole('button', {
       name: `${a11yStrings.comment_123} 42, ${a11yStrings.consensus}`
     })
+  })
+
+  it('provides a text table for the selected statement vote bars, including statement zero', async () => {
+    const zeroData: PCAData = {
+      ...data,
+      repness: {
+        '0': [{ ...data.repness!['0'][0], tid: 0 }]
+      },
+      'group-votes': {
+        '0': { 'n-members': 12, votes: { '0': { A: 10, D: 1, S: 1 } } }
+      }
+    }
+    const { container } = render(<PCAVisualization data={zeroData} s={a11yStrings} />)
+
+    expect(screen.queryByRole('table')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: `${a11yStrings.group_123} A` }))
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: `${a11yStrings.comment_123} 0, ${a11yStrings.group_123} A`
+      })
+    )
+
+    const table = screen.getByRole('table', { name: `${a11yStrings.comment_123} 0` })
+    expect(within(table).getByRole('columnheader', { name: a11yStrings.agree })).toBeTruthy()
+    expect(within(table).getByRole('columnheader', { name: a11yStrings.disagree })).toBeTruthy()
+    expect(within(table).getByRole('columnheader', { name: a11yStrings.pass })).toBeTruthy()
+    const row = within(table).getByRole('row', { name: 'A 10 1 1' })
+    expect(within(row).getByRole('rowheader', { name: 'A' })).toBeTruthy()
+    await expectNoA11yViolations(container)
+  })
+
+  it('names a group control when no letter is defined for its id', () => {
+    const additionalGroup: PCAData = {
+      ...data,
+      'group-clusters': [{ id: 8, center: [-1, 1], members: [10] }]
+    }
+    render(<PCAVisualization data={additionalGroup} s={a11yStrings} />)
+
+    screen.getByRole('button', { name: `${a11yStrings.group_123} 8` })
   })
 })

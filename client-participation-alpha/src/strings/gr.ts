@@ -40,7 +40,7 @@ s.commentSent =
   "Η ιδέα υποβλήθηκε! Μόνο άλλοι συμμετέχοντες θα δουν την ιδέα σας και θα συμφωνήσουν ή θα διαφωνήσουν."
 s.helpWriteListIntro = "Τι κάνει μια ιδέα καλή;"
 s.helpWriteListRaisNew = "Δώστε νέες προοπτικές, εμπειρίες ή προβληματισμούς"
-s.helpWriteListShort = "Καθαρή και περιεκτική (να περιορίζεται σε 140 χαρακτήρες)"
+s.helpWriteListShort = "Καθαρή και περιεκτική (να περιορίζεται σε 400 χαρακτήρες)"
 s.helpWriteListStandalone = "Ξεχωριστή ιδέα"
 s.submitComment = "Υποβολή"
 s.tipCommentsRandom =

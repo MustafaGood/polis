@@ -13,8 +13,8 @@ or to every pull-request branch.
 | Deliverable | Status | Evidence or remaining work |
 | --- | --- | --- |
 | Participant labels, focus, status, landmarks and form errors | Partial | Implemented and covered in part by existing component tests; complete keyboard and screen-reader journeys remain to be assessed. |
-| Dialog keyboard behavior | Partial | Implementation and regression tests exist; verify the live participant and admin flows, including focus restoration. |
-| PCA alternative and controls | Partial | An alternative and accessible controls exist; check the completeness of the information and interaction manually. |
+| Dialog keyboard behavior | Partial | Participant regression tests cover Tab, Escape, clipboard feedback and focus restoration even when the invite form disappears; verify live participant and admin flows. |
+| PCA alternative and controls | Partial | Group counts, controls and a table of displayed statement vote counts are available; the plot geometry and user position still lack equivalent text, and manual assessment remains. |
 | jest-axe and cypress-axe | Partial | Tests and CI workflows exist. The Cypress smoke tests cover only the voting card and submission form; the updated seeded setup still needs an isolated-stack run. |
 | Report-client jsx-a11y lint and triage | Partial | A separate lint command found 23 accessibility-rule errors; full visualization remediation is outside the plan. |
 | Admin checkboxes, dialogs and tables | Partial | Accessibility changes exist; verify all relevant names, keyboard flows and table relationships manually. |
@@ -35,6 +35,19 @@ a claim that CI is green.
 
 ## Test results
 
+- Latest participant changes: `npm test -- --runInBand` passed (16 suites,
+  125 tests) and `npm run lint` passed. Jest exercises the invite-to-dialog
+  focus handoff, clipboard feedback, dialog description and the PCA vote-count
+  table, including statement ID 0. TypeScript still reports 34 diagnostics in
+  existing files; none are in the changed modal, focus or PCA files. These
+  tests do not replace a real browser or screen-reader assessment.
+- Subsequent form and focus changes: `npm test -- --runInBand` passed
+  (16 suites, 118 tests) and `npm run lint` passed. Component tests cover
+  validation, pending submissions and focus restoration. An isolated
+  Chromium test used simulated keyboard input and mocked APIs to check
+  voting controls, the three forms, and focus after code login. No real
+  conversation data was submitted. Real end-to-end flows and screen-reader
+  announcements still need assessment.
 - E2E smoke spec: focused Prettier and ESLint checks passed; the Cypress
   execution with the new seeded setup has not been run on an isolated stack.
 - Participant: `npm test -- --runInBand` passed (15 suites, 103 tests);

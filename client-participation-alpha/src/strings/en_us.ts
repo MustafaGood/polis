@@ -59,7 +59,7 @@ const s: Translations = {
     "Statement submitted! Only other participants will see your statement and agree or disagree.",
   helpWriteListIntro: "What makes for a good statement?",
   helpWriteListRaisNew: "A new perspective, experience, or issue",
-  helpWriteListShort: "Clear & concise wording (limited to 140 characters)",
+  helpWriteListShort: "Clear & concise wording (limited to 400 characters)",
   helpWriteListStandalone: "A stand-alone idea",
   submitComment: "Submit",
   tipCommentsRandom:

@@ -203,7 +203,7 @@ export function useVisualizationData(
 
   // Extract vote data for each group for the selected statement
   const groupVoteData: GroupVoteInfo[] = useMemo(() => {
-    if (!selectedStatementTid || !data['group-votes']) return []
+    if (selectedStatementTid === null || !data['group-votes']) return []
 
     const tidString = selectedStatementTid.toString()
     const voteData: GroupVoteInfo[] = []

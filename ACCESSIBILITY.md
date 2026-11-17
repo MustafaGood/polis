@@ -4,6 +4,10 @@ The LIA accessibility work prioritizes `client-participation-alpha`: forms,
 keyboard focus, dialogs, status messages, landmarks and the PCA visualization.
 The admin interface is a supplementary scope.
 
+For a selected PCA statement, a table exposes the displayed groups' agree,
+disagree and pass vote counts. It does not yet describe the plot geometry or
+the participant's position.
+
 ## Review and testing
 
 - Run the participant Jest tests and the Cypress accessibility smoke tests as

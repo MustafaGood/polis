@@ -9,7 +9,7 @@ that a success criterion is satisfied throughout the product.
 | Labels, structure, landmarks and headings | 1.3.1, 2.4.1, 2.4.6, 3.3.2 | Review all affected flows and languages with assistive technology. |
 | Keyboard, focus and dialogs | 2.1.1, 2.1.2, 2.4.3, 2.4.7 | Verify complete keyboard journeys, dialog focus trapping, Escape and focus restoration in a browser. |
 | Errors and status messages | 3.3.1, 3.3.3, 4.1.3 | Trigger errors and confirm announcements with a screen reader. |
-| PCA visualization and controls | 1.1.1, 1.3.1, 2.1.1, 4.1.2 | Verify the text alternative conveys the relevant data and controls work without a mouse. |
+| PCA visualization and controls | 1.1.1, 1.3.1, 2.1.1, 4.1.2 | A table exposes displayed statement vote counts; plot geometry and user position still need an equivalent alternative. Verify controls without a mouse. |
 | Admin checkboxes, tables and dialogs | 1.3.1, 2.1.1, 2.4.3, 4.1.2 | Review accessible names, table relationships and complete keyboard/screen-reader behavior. |
 
 The plan excludes full remediation of the report client's visualizations;

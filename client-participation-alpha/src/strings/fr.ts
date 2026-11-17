@@ -42,7 +42,7 @@ s.commentSent =
 s.helpWriteListIntro = "Une bonne affirmation:"
 s.helpWriteListRaisNew =
   "présente un nouveau point de vue, de nouvelles expériences ou de nouveaux enjeux;"
-s.helpWriteListShort = "est claire et concise (compte au plus 140 caractères)"
+s.helpWriteListShort = "est claire et concise (compte au plus 400 caractères)"
 s.helpWriteListStandalone = "présente une seule idée;"
 s.submitComment = "Publier"
 s.tipCommentsRandom =

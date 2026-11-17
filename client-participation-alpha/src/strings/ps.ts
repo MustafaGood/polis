@@ -43,7 +43,7 @@ s.commentSent =
   "بیانیه وسپارل شوه! یوازې نور ګډونوال به ستاسو بیانیه وګوري او موافق یا غیر موافق به وي."
 s.helpWriteListIntro = "څه څیز د ښه بیان لپاره جوړیږي?"
 s.helpWriteListRaisNew = "یو نوی لیدلورې، تجربې، یا مسله"
-s.helpWriteListShort = "واضح او لنډ ټکي (تر 140 حروفو پورې محدود وي)"
+s.helpWriteListShort = "واضح او لنډ ټکي (تر 400 حروفو پورې محدود وي)"
 s.helpWriteListStandalone = "یو جلا نظر"
 s.submitComment = "وسپارئ"
 s.tipCommentsRandom =

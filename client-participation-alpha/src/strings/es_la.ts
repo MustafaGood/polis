@@ -43,7 +43,7 @@ s.commentSent =
   "Afirmación enviada. Solo otros participantes verán tu afirmación e indicarán si están de acuerdo o en desacuerdo."
 s.helpWriteListIntro = "¿Qué hace que una afirmación se considere buena?"
 s.helpWriteListRaisNew = "Plantea una perspectiva, una experiencia o un problema nuevos"
-s.helpWriteListShort = "Tiene una redacción clara y concisa (límite de 140 caracteres)"
+s.helpWriteListShort = "Tiene una redacción clara y concisa (límite de 400 caracteres)"
 s.helpWriteListStandalone = "Plantea una idea concreta"
 s.submitComment = "Enviar"
 s.tipCommentsRandom =

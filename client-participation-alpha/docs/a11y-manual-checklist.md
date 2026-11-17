@@ -3,7 +3,12 @@
 **Vecka 11–12 (P1)** · WCAG 2.1 AA · Konversation: `52czbnk3jn`  
 **URL:** `http://127.0.0.1:4321/52czbnk3jn` (undvik Cursor-browser HTTPS-certfel)
 
-Markera: Pass · Fail · N/A · Ej testat
+Markera: Pass · Delvis · Fail · N/A · Ej testat
+
+**Kompletterande webbläsarkontroll 2026-11-18:** Delar av tangentbordstestet
+kördes med simulerade tangenttryck i Chromium mot isolerade komponenter och
+mockade API-svar. Resultat märkta "Delvis" nedan gäller endast den testmiljön,
+inte hela liveflödet eller en skärmläsare.
 
 ---
 
@@ -20,8 +25,8 @@ Markera: Pass · Fail · N/A · Ej testat
 
 | #   | Check                                                      | Resultat  | Anteckning |
 | --- | ---------------------------------------------------------- | --------- | ---------- |
-| 1.1 | Tab når Agree / Disagree / Pass i logisk ordning           | Ej testat |            |
-| 1.2 | Enter/Space aktiverar röstknapp                            | Ej testat |            |
+| 1.1 | Tab når Agree / Disagree / Pass i logisk ordning           | Delvis    | Chromium, isolerad komponent; 3 px fokusring |
+| 1.2 | Enter/Space aktiverar röstknapp                            | Delvis    | Space på Agree med mockad röst; övriga kombinationer ej testade |
 | 1.3 | Knappar har tillgängligt namn (aria-label / text)          | Ej testat |            |
 | 1.4 | Efter röst: nästa statement eller slutvy utan fokusförlust | Ej testat |            |
 | 1.5 | `role="alert"` vid vote-fel (om simulerat)                 | Ej testat |            |
@@ -36,11 +41,12 @@ Markera: Pass · Fail · N/A · Ej testat
 | #   | Check                                                         | Resultat  | Anteckning |
 | --- | ------------------------------------------------------------- | --------- | ---------- |
 | 2.1 | Label kopplad till textarea (`htmlFor` / `id`)                | Ej testat |            |
-| 2.2 | Tab: label-kontext → textarea → Submit                        | Ej testat |            |
-| 2.3 | Submit disabled tills text finns; aktiveras med Enter i form  | Ej testat |            |
+| 2.2 | Tab: label-kontext → textarea → Submit                        | Delvis    | Chromium, isolerad komponent och synlig fokusring |
+| 2.3 | Submit disabled tills text finns; Tab till knappen och Enter/Space aktiverar den | Delvis | Enter testat med mockat API; Space ej testat |
 | 2.4 | Framgång: `role="status"` (live region)                       | Ej testat |            |
-| 2.5 | Fel: `role="alert"` + `aria-describedby` / `aria-invalid`     | Ej testat |            |
+| 2.5 | Fel annonseras; duplicerad text kopplas till fältet som ogiltig | Ej testat |            |
 | 2.6 | Hjälptext HTML (`<b>`) renderas korrekt (inga trasiga taggar) | Ej testat |            |
+| 2.7 | Teckengränsen och räknaren visar 400 även på andra språk; texten finns kvar under inskick och vid fel | Delvis | Engelska och mockat API testat; andra språk ej körda i webbläsare |
 
 ---
 
@@ -51,9 +57,10 @@ _Visas ofta när statements är slut._
 | #   | Check                                                 | Resultat  | Anteckning |
 | --- | ----------------------------------------------------- | --------- | ---------- |
 | 3.1 | Synlig label för e-postfält                           | Ej testat |            |
-| 3.2 | Tab till input → Subscribe                            | Ej testat |            |
-| 3.3 | Felmeddelande via `role="alert"` + `aria-describedby` | Ej testat |            |
+| 3.2 | Tab till input → Subscribe                            | Delvis    | Chromium, isolerad komponent och synlig fokusring |
+| 3.3 | API-fel annonseras och kopplas till fältet utan att ange en giltig adress som ogiltig | Ej testat |            |
 | 3.4 | Framgång via `role="status"`                          | Ej testat |            |
+| 3.5 | Ogiltig e-post kan skickas till webbläsarens validering och ingen API-begäran görs | Delvis | Chromium med mockat API |
 
 ---
 
@@ -64,19 +71,24 @@ _Om treevite/invite krävs._
 | #   | Check                                             | Resultat  | Anteckning |
 | --- | ------------------------------------------------- | --------- | ---------- |
 | 4.1 | Båda fälten har synliga labels                    | Ej testat |            |
-| 4.2 | Fel: `role="alert"` + `aria-invalid` på rätt fält | Ej testat |            |
+| 4.2 | Ogiltig kod annonseras och anges på rätt fält; nätverksfel anges inte som ogiltig kod | Ej testat |            |
 | 4.3 | Framgång: `role="status"`                         | Ej testat |            |
+| 4.4 | Endast blanksteg kan inte skickas; det andra kodformuläret väntar medan ett inskick pågår | Delvis | Blanksteg och upprepat inskick testade i Chromium; båda formulärens samtidighet testad med Jest |
 
 ---
 
 ## 5. Modal (TreeviteLoginCodeModal)
+
+Automatiserade Jest-tester täcker fokus, Tab, Escape, dialogens beskrivning,
+kopieringsfel och återgång till deltagandet när formuläret har försvunnit.
+Tabellen nedan gäller fortfarande manuella kontroller i det verkliga flödet.
 
 | #   | Check                                            | Resultat  | Anteckning |
 | --- | ------------------------------------------------ | --------- | ---------- |
 | 5.1 | Fokus flyttas in i modal vid öppning             | Ej testat |            |
 | 5.2 | Tab fångas inne i modal (fokusfälla)             | Ej testat |            |
 | 5.3 | Escape stänger modal                             | Ej testat |            |
-| 5.4 | Fokus återställs till utlösare efter stängning   | Ej testat |            |
+| 5.4 | Fokus återställs till utlösaren eller deltagandet om utlösaren försvunnit | Ej testat | |
 | 5.5 | `aria-labelledby` / `aria-describedby` på dialog | Ej testat |            |
 
 ---
@@ -95,7 +107,7 @@ _Om treevite/invite krävs._
 ## Historisk sammanfattning (kod och automatiserade kontroller)
 
 Denna sammanfattning är inte ett resultat av de manuella kontrollerna ovan.
-Deras status är fortfarande "Ej testat" tills resultat och testmiljö registreras.
+Kontrollernas aktuella status och testmiljö anges i respektive tabell.
 
 | Område           | Status           | Blockerande fynd                   |
 | ---------------- | ---------------- | ---------------------------------- |

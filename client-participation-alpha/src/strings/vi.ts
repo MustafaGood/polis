@@ -43,7 +43,7 @@ s.commentSent =
   "Đã gửi ý kiến! Chỉ những người tham gia khác mới có thể nhìn thấy và đồng ý hoặc không đồng ý với ý kiến của bạn."
 s.helpWriteListIntro = "Thế nào là một ý kiến phù hợp?"
 s.helpWriteListRaisNew = "Một quan điểm, trải nghiệm hoặc vấn đề mới"
-s.helpWriteListShort = "Cách viết ngắn gọn và rõ ràng (tối đa 140 ký tự)"
+s.helpWriteListShort = "Cách viết ngắn gọn và rõ ràng (tối đa 400 ký tự)"
 s.helpWriteListStandalone = "Một ý tưởng độc lập"
 s.submitComment = "Gửi"
 s.tipCommentsRandom =

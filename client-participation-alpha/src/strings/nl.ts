@@ -40,7 +40,7 @@ s.commentSent =
   "Reactie verzonden! Andere deelnemers zullen uw reactie zien en akkoord zijn of niet."
 s.helpWriteListIntro = "Wat is een goed voorstel?"
 s.helpWriteListRaisNew = "Kaart nieuwe perspectieven, ervaringen of problemen aan"
-s.helpWriteListShort = "Duidelijk en beknopt (beperkt tot 140 tekens)"
+s.helpWriteListShort = "Duidelijk en beknopt (beperkt tot 400 tekens)"
 s.helpWriteListStandalone = "Een idee dat op zichzelf staat"
 s.submitComment = "Reageer"
 s.tipCommentsRandom = "Reacties zijn willekeurig gesorteerd. U bent op niemand aan het reageren"

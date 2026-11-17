@@ -17,7 +17,7 @@ export function GroupLabels({ hulls, selectedGroup, userPosition }: GroupLabelsP
         if (!center || participantCount <= 0) return null
 
         const isSelected = selectedGroup === groupId
-        const labelLetter = groupLetters[groupId] ?? ''
+        const labelLetter = groupLetters[groupId] ?? String(groupId)
         const iconSize = 16
         let labelOffsetX = 0
         let labelOffsetY = 28
@@ -29,7 +29,7 @@ export function GroupLabels({ hulls, selectedGroup, userPosition }: GroupLabelsP
           const userRadius = 17
 
           // Estimate label dimensions for collision detection
-          const letterWidth = 8
+          const letterWidth = labelLetter.length * 8
           const numberWidth = participantCount.toString().length * 12
           const contentWidth = letterWidth + iconSize + numberWidth + 12
           const labelWidth = contentWidth + padding * 2
@@ -72,7 +72,7 @@ export function GroupLabels({ hulls, selectedGroup, userPosition }: GroupLabelsP
         const numberX = iconSize / 2 + 4
 
         // Estimate label dimensions
-        const letterWidth = 8
+        const letterWidth = labelLetter.length * 8
         const numberWidth = participantCount.toString().length * 12
         const contentLeft = letterX - letterWidth // Left edge of letter
         const contentRight = numberX + numberWidth // Right edge of number

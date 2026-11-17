@@ -74,6 +74,9 @@ export default function PCAVisualization({
         `${s.group_123} ${groupLetters[groupId] ?? groupId}, ${participantCount}`
     )
     .join('; ')
+  const displayedVoteData = groupVoteData.filter(
+    (vote) => vote.total > 0 && hulls.some((hull) => hull.groupId === vote.groupId && hull.center)
+  )
 
   // Find the comment text for the selected statement
   const selectedComment = useMemo(() => {
@@ -196,6 +199,30 @@ export default function PCAVisualization({
             : `${s.group_123} ${groupLetters[selectedGroup!] ?? selectedGroup}`}
           {selectedStatement ? ` ${s.comment_123} ${selectedStatement.tid}` : null}
         </p>
+      )}
+
+      {selectedStatement && displayedVoteData.length > 0 && (
+        <table style={{ width: '100%', tableLayout: 'fixed', overflowWrap: 'anywhere' }}>
+          <caption>{`${s.comment_123} ${selectedStatement.tid}`}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{s.group_123}</th>
+              <th scope="col">{s.agree}</th>
+              <th scope="col">{s.disagree}</th>
+              <th scope="col">{s.pass}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayedVoteData.map(({ groupId, agree, disagree, skip }) => (
+              <tr key={groupId}>
+                <th scope="row">{groupLetters[groupId] ?? groupId}</th>
+                <td>{agree}</td>
+                <td>{disagree}</td>
+                <td>{skip}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
 
       {/* Statement info */}

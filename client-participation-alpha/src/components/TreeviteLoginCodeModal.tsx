@@ -12,9 +12,11 @@ export default function TreeviteLoginCodeModal({ s }: TreeviteLoginCodeModalProp
   const [visible, setVisible] = useState<boolean>(false)
   const [loginCode, setLoginCode] = useState<string>('')
   const [copied, setCopied] = useState<boolean>(false)
+  const [copyError, setCopyError] = useState<string>('')
   const dialogRef = useRef<HTMLDivElement>(null)
   const previouslyFocusedRef = useRef<HTMLElement | null>(null)
   const titleId = useId()
+  const descriptionId = useId()
 
   useEffect(() => {
     const onIssued = (e: CustomEventInit) => {
@@ -32,8 +34,16 @@ export default function TreeviteLoginCodeModal({ s }: TreeviteLoginCodeModalProp
   const close = useCallback(() => {
     setVisible(false)
     setCopied(false)
+    setCopyError('')
     requestAnimationFrame(() => {
-      previouslyFocusedRef.current?.focus?.()
+      const active = document.activeElement
+      if (active === document.body || dialogRef.current?.contains(active)) {
+        const previous = previouslyFocusedRef.current
+        if (previous?.isConnected && previous !== document.body) previous.focus()
+        if (document.activeElement === document.body || document.activeElement !== previous) {
+          document.querySelector<HTMLElement>('[data-participation-content]')?.focus()
+        }
+      }
       previouslyFocusedRef.current = null
     })
   }, [])
@@ -77,7 +87,7 @@ export default function TreeviteLoginCodeModal({ s }: TreeviteLoginCodeModalProp
           e.preventDefault()
           last.focus()
         }
-      } else if (active === last) {
+      } else if (active === last || !dialog.contains(active)) {
         e.preventDefault()
         first.focus()
       }
@@ -92,12 +102,15 @@ export default function TreeviteLoginCodeModal({ s }: TreeviteLoginCodeModalProp
   const message = s.invite_code_accepted_message.replace('{{login_code}}', loginCode)
 
   const copyToClipboard = async () => {
+    if (copied) return
+    setCopyError('')
     try {
       await navigator.clipboard.writeText(loginCode)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch {
-      // ignore
+    } catch (error) {
+      console.error('Copying the login code failed:', error)
+      setCopyError(`${s.error}. ${s.oidcTryAgain}`)
     }
   }
 
@@ -108,22 +121,26 @@ export default function TreeviteLoginCodeModal({ s }: TreeviteLoginCodeModalProp
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
+      aria-describedby={descriptionId}
     >
       <style>{styles}</style>
       <div className="tv-modal">
         <h3 id={titleId}>{s.invite_code_required_short}</h3>
-        <p style={{ whiteSpace: 'pre-wrap' }}>{message}</p>
+        <p id={descriptionId} style={{ whiteSpace: 'pre-wrap' }}>
+          {message}
+        </p>
         <div className="tv-code-box">
           <code>{loginCode}</code>
           <button
             type="button"
             className={`tv-copy${copied ? ' copied' : ''}`}
             onClick={copyToClipboard}
-            disabled={copied}
+            aria-disabled={copied || undefined}
           >
             {copied ? s.copied : s.copy}
           </button>
         </div>
+        {copyError && <p role="alert">{copyError}</p>}
         <div className="tv-actions">
           <button type="button" className="tv-primary" onClick={close}>
             {s.ok_got_it}

@@ -42,7 +42,7 @@ s.commentSent =
   "Kauli imetumwa! Ni washiriki wengine pekee ndio wataona kauli yako na kuikubali au kuikataa."
 s.helpWriteListIntro = "Je, kauli nzuri inapaswa iweje?"
 s.helpWriteListRaisNew = "Mtazamo, hali ulizopitia au tatizo jipya"
-s.helpWriteListShort = "Yenye maneno mafupi na yanayoeleweka (isizidi herufi 140)"
+s.helpWriteListShort = "Yenye maneno mafupi na yanayoeleweka (isizidi herufi 400)"
 s.helpWriteListStandalone = "Wazo linalojitegemea"
 s.submitComment = "Tuma"
 s.tipCommentsRandom =

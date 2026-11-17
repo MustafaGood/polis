@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { submitComment } from '../api/comments'
 import { getConversationToken } from '../lib/auth'
 import type { Translations } from '../strings/types'
@@ -46,6 +46,10 @@ export default function SurveyForm({
   const [text, setText] = useState<string>('')
   const [feedback, setFeedback] = useState<string>('')
   const [error, setError] = useState<string>('')
+  const [invalidText, setInvalidText] = useState<boolean>(false)
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const submitRef = useRef<HTMLButtonElement>(null)
   const [isAuthed, setIsAuthed] = useState<boolean>(!!getConversationToken(conversation_id)?.token)
   const maxLength = 400
 
@@ -61,22 +65,31 @@ export default function SurveyForm({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!text.trim()) return
+    if (isSubmitting || !text.trim()) return
 
+    setIsSubmitting(true)
     setFeedback('')
     setError('')
+    setInvalidText(false)
     const submittedText = text
-    setText('')
 
     try {
       await submitPerspectiveAPI(submittedText, conversation_id)
+      if (document.activeElement === submitRef.current) textareaRef.current?.focus()
+      setText('')
       setFeedback(s.commentSent)
     } catch (err: unknown) {
       console.error('Comment submission failed:', err)
 
       // Parse error message
-      const error = err as { responseText?: string; message?: string }
-      const errorText = error.responseText || error.message || ''
+      let errorText = ''
+      if (typeof err === 'object' && err !== null) {
+        if ('responseText' in err && typeof err.responseText === 'string') {
+          errorText = err.responseText
+        } else if ('message' in err && typeof err.message === 'string') {
+          errorText = err.message
+        }
+      }
       let errorMessage = s.commentSendFailed
 
       if (errorText.includes('polis_err_conversation_is_closed')) {
@@ -86,6 +99,7 @@ export default function SurveyForm({
         errorText.includes('polis_err_comment_duplicate')
       ) {
         errorMessage = s.commentErrorDuplicate
+        setInvalidText(true)
       } else if (errorText.includes('polis_err_xid_required')) {
         errorMessage = s.xidRequired
       } else if (errorText.includes('polis_err_xid_not_allowed')) {
@@ -95,8 +109,8 @@ export default function SurveyForm({
       }
 
       setError(errorMessage)
-      // Restore the text so user doesn't lose their work
-      setText(submittedText)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -111,7 +125,7 @@ export default function SurveyForm({
           role="status"
           style={{
             textAlign: 'center',
-            color: '#28a745',
+            color: '#1e6c34',
             fontWeight: 'bold',
             marginBottom: '1rem'
           }}
@@ -151,18 +165,34 @@ export default function SurveyForm({
           <div className="textarea-wrapper">
             <textarea
               id="comment-textarea"
+              ref={textareaRef}
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => {
+                setText(e.target.value)
+                setError('')
+                setInvalidText(false)
+                setFeedback('')
+              }}
               maxLength={maxLength}
-              aria-invalid={!!error}
-              aria-describedby={error ? 'survey-form-error' : undefined}
+              required
+              readOnly={isSubmitting}
+              aria-invalid={invalidText}
+              aria-describedby={
+                error ? 'comment-char-counter survey-form-error' : 'comment-char-counter'
+              }
             />
-            <div className="char-counter">
+            <div id="comment-char-counter" className="char-counter">
               {text.length} / {maxLength}
             </div>
           </div>
-          <button type="submit" className="submit-button" disabled={!text.trim()}>
-            {s.submitComment}
+          <button
+            ref={submitRef}
+            type="submit"
+            className="submit-button"
+            disabled={!text.trim()}
+            aria-disabled={isSubmitting || undefined}
+          >
+            {isSubmitting ? s.submitting : s.submitComment}
           </button>
         </div>
       </form>

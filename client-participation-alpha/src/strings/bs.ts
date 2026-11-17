@@ -42,7 +42,7 @@ s.commentSent =
   "Izjava je poslana! Vašu izjavu će vidjeti i s njom će se moći složiti ili ne složiti samo drugi učesnici."
 s.helpWriteListIntro = "Šta čini dobru izjavu?"
 s.helpWriteListRaisNew = "Novi pogled na stvari, iskustvo ili problem"
-s.helpWriteListShort = "Jasna i sažeta formulacija (najviše 140 znakova)"
+s.helpWriteListShort = "Jasna i sažeta formulacija (najviše 400 znakova)"
 s.helpWriteListStandalone = "Jedna ideja"
 s.submitComment = "Pošalji"
 s.tipCommentsRandom =

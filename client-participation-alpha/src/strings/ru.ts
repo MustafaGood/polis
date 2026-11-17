@@ -39,7 +39,7 @@ s.commentSent =
   "Комметарий отправлен! Только другие участники увидят ваш комментарий и будут голосовать, соглашаясь или не соглашаясь."
 s.helpWriteListIntro = "Как написать хороший комментарий?"
 s.helpWriteListRaisNew = "Добавляйте новые мысли, идеи или проблемы"
-s.helpWriteListShort = "Пишите кратко: не больше 140 символов"
+s.helpWriteListShort = "Пишите кратко: не больше 400 символов"
 s.helpWriteListStandalone = "В комментарии должна быть только одна идея или мысль"
 s.submitComment = "Отправить"
 s.tipCommentsRandom =

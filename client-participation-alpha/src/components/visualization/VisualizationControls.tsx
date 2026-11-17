@@ -71,7 +71,7 @@ export function VisualizationControls({
         <span style={{ color: 'var(--color-text)', fontSize: '0.95rem' }}>{s.group_123}</span>
         {hulls.map(({ groupId }) => {
           const color = groupColors[groupId] ?? '#999'
-          const letter = groupLetters[groupId] ?? ''
+          const letter = groupLetters[groupId] ?? String(groupId)
           const isGroupSelected = selectedGroup === groupId
           return (
             <button
