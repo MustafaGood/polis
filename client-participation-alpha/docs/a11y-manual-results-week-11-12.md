@@ -1,4 +1,4 @@
-# A11y manuell testning & i18n — resultat (Vecka 11–12)
+# Resultat av manuell tillgänglighetstestning och i18n (vecka 11 och 12)
 
 **Datum:** 2026-08-03  
 **Branch:** `feature/a11y-manual-i18n`  
@@ -8,9 +8,9 @@
 
 ## Metod
 
-1. **Kodgranskning** av P0/P1-ändringar (labels, live regions, fokus, modal)
-2. **DOM-smoke** via SSR-HTML (`curl` mot alpha)
-3. **Automatiserade axe-tester** från Vecka 9–10 (jest-axe + cypress-axe)
+1. **Kodgranskning** av ändringar i P0 och P1 (labels, live regions, fokus, modal)
+2. **Kontroll av DOM** via SSR HTML (`curl` mot alpha)
+3. **Automatiserade tester med axe** från vecka 9 och 10 (jest-axe + cypress-axe)
 4. **i18n:** `?ui_lang=fr` verifierad i HTML
 
 Full skärmläsar-session (NVDA/VoiceOver) rekommenderas fortfarande som manuell stickprov.
@@ -30,14 +30,14 @@ Full skärmläsar-session (NVDA/VoiceOver) rekommenderas fortfarande som manuell
 
 ## Fynd som åtgärdades denna sprint
 
-- Trasiga bold-taggar i help/tip-strängar (`en_us` + ar/bs/es_la/hr/my/ps/sw/vi)
-- Orphan `</i>` i bl.a. zh, pt_br, nl, it, da, fy_nl
+* Trasiga boldtaggar i hjälptexter och tips (`en_us` + ar/bs/es_la/hr/my/ps/sw/vi)
+* Ensamma `</i>` i bland annat zh, pt_br, nl, it, da och fy_nl
 
 ## Kvar / rekommendation
 
-- [ ] En manuell NVDA-/VoiceOver-runda på röst + statement-submit (stickprov)
-- [ ] Live-test av Treevite-modal när invite-flöde är tillgängligt
-- [ ] E-post-API returnerar 404 i dev — a11y för fel-live-region fungerar, men produktfelet är utanför a11y-spåret
+* [ ] Ett manuellt stickprov med NVDA eller VoiceOver för röstning och inskick av påstående
+* [ ] Testa modalen i Treevite i webbläsaren när inbjudningsflödet är tillgängligt
+* [ ] API för e-post returnerar 404 i utvecklingsmiljön. Felmeddelandets live region fungerar, men produktfelet ligger utanför tillgänglighetsarbetet.
 
 ## Koppling till tidigare PR:er
 
@@ -47,4 +47,4 @@ Full skärmläsar-session (NVDA/VoiceOver) rekommenderas fortfarande som manuell
 | #2         | `aria-describedby` / `aria-invalid`, `aria-pressed`     |
 | #3         | PCA textalternativ                                      |
 | #4         | jest-axe + cypress-axe                                  |
-| #5 (denna) | i18n HTML-fix + manuell checklista/resultat             |
+| #5 (denna) | Korrigering av HTML för i18n samt manuell checklista och resultat |
