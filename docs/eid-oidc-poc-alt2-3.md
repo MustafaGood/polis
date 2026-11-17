@@ -1,4 +1,4 @@
-# Alt 2.3 — Participant OIDC PoC (mock / env-swap)
+# Alt 2.3: Participant OIDC PoC (mock / env-swap)
 
 **Författare:** Mustafa Salahuddin  
 **Efter:** Alt 2.1 + Alt 2.2  
@@ -69,14 +69,14 @@ SELECT oidc_sub, uid, created FROM oidc_user_mappings ORDER BY created DESC LIMI
 
 ## Risker / begränsningar
 
-- Utan `PUBLIC_ENABLE_OIDC_LOGIN` ändras inget för befintliga användare.  
+* Utan `PUBLIC_ENABLE_OIDC_LOGIN` ändras inget för befintliga användare.  
 - Riktig eID kräver Idura-sandbox från OKS.  
-- GDPR: lagra endast broker `sub` (+ e-post om simulator/Auth0 ger den) — ingen personnummer.
+* GDPR: lagra endast broker `sub` (+ e-post om simulator/Auth0 ger den), inte personnummer.
 
 ## Checklista Alt 2.3
 
-- [x] Minimal PoC (OIDC-knapp + AuthProvider + connector)
-- [x] Dokumentera env-byten (simulator → Idura)
-- [x] Testplan för mentor
-- [x] Uppdatera tavlan + länka PR/branch — https://github.com/MustafaGood/polis/pull/6
-- [x] Kort demo (2026-08-18): knappen → oidc-simulator → `test.user.0@polis.test` → Signed in as …
+* [x] Minimal PoC (OIDC-knapp + AuthProvider + connector)
+* [x] Dokumentera env-byten (simulator → Idura)
+* [x] Testplan för mentor
+* [x] Uppdatera tavlan + länka PR/branch: https://github.com/MustafaGood/polis/pull/6
+* [x] Kort demo (2026-08-18): knappen → oidc-simulator → `test.user.0@polis.test` → Signed in as …

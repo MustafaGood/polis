@@ -1,4 +1,4 @@
-# Alt 2.2 — BankID/eID: krav, alternativ & spike
+# Alt 2.2: BankID/eID, krav, alternativ och spike
 
 **Författare:** Mustafa Salahuddin  
 **Efter:** Alt 2.1 inventering (`docs/eid-auth-inventory-alt2-1.md`)  
@@ -27,12 +27,12 @@ Mer information: [auth-inventering](./eid-auth-inventory-alt2-1.md), [eID-PoC oc
 
 ## Checklista
 
-- [x] Bekräfta Idura-sandbox och tidsplan **(bekräftat enligt Mustafa)**
-- [x] Jämföra broker-alternativ (Idura, Signicat, GrandID, Sweden Connect)
-- [x] Lista krav från organisationen (kontrakt, testkonto, redirect-URI)
-- [x] Spike-plan: mock OIDC-simulator vs riktig Idura-sandbox
-- [x] Risker: miljö, hemligheter, GDPR, XID-konflikt
-- [x] Rekommendation + nästa steg till Alt 2.3
+* [x] Bekräfta Idura-sandbox och tidsplan **(bekräftat enligt Mustafa)**
+* [x] Jämföra broker-alternativ (Idura, Signicat, GrandID, Sweden Connect)
+* [x] Lista krav från organisationen (kontrakt, testkonto, redirect-URI)
+* [x] Spike-plan: mock OIDC-simulator vs riktig Idura-sandbox
+* [x] Risker: miljö, hemligheter, GDPR, XID-konflikt
+* [x] Rekommendation + nästa steg till Alt 2.3
 
 ## Broker-jämförelse
 
@@ -46,7 +46,7 @@ Polis integrerar **inte** BankID/Freja direkt. Standardväg: **OIDC-broker med J
 | Sweden Connect | Via federation | Via federation | Via offentlig sektor | Offentlig eIDAS-nod | Ja (federation) | Mer relevant för myndigheter än LIA-MVP |
 | Native BankID SDK | Ja | Nej | Nej | Lång ledtid | Nej | **Ej i scope** (praktikplan A5) |
 
-**Praktiskt för LIA:** Idura Verify-sandbox räcker för utveckling. Produktion kräver Swedbank-godkännande via Idura (veckor–månader).
+**Praktiskt för LIA:** Idura Verify-sandbox räcker för utveckling. Produktion kräver Swedbank-godkännande via Idura (veckor till månader).
 
 ## Krav från organisationen (OKS)
 
@@ -67,7 +67,7 @@ Polis integrerar **inte** BankID/Freja direkt. Standardväg: **OIDC-broker med J
 
 1. Använd befintlig `oidc-simulator` (`AUTH_ISSUER=https://localhost:3000/`)
 2. Dokumentera env-byten som senare pekas om till Idura:
-   - `AUTH_ISSUER`, `AUTH_AUDIENCE`, `AUTH_CLIENT_ID`, `AUTH_CLIENT_SECRET`, JWKS-URI
+   * `AUTH_ISSUER`, `AUTH_AUDIENCE`, `AUTH_CLIENT_ID`, `AUTH_CLIENT_SECRET`, JWKS-URI
 3. Skissa deltagarflöde i alpha: **Logga in** → OIDC redirect → `oidc_user_mappings` → **Standard User JWT** (samma som inventering A1)
 4. Definiera regel för XID + OIDC-konflikt (redan UI-varning finns)
 
@@ -97,8 +97,8 @@ Polis integrerar **inte** BankID/Freja direkt. Standardväg: **OIDC-broker med J
 
 ## Nästa steg → Alt 2.3
 
-- [x] Idura-sandbox och tidsplan bekräftade enligt Mustafa
-- [x] PoC och simulator-demo dokumenterade i Alt 2.3
-- [ ] Verifiera riktig BankID/Freja-login och API-flöde mot Idura-sandbox
-- [ ] Code review av de lokala Idura-ändringarna
+* [x] Idura-sandbox och tidsplan bekräftade enligt Mustafa
+* [x] PoC och simulator-demo dokumenterade i Alt 2.3
+* [ ] Verifiera riktig BankID/Freja-login och API-flöde mot Idura-sandbox
+* [ ] Code review av de lokala Idura-ändringarna
 

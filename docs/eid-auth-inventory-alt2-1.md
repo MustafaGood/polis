@@ -1,7 +1,7 @@
-# Alt 2.1 — Auth-inventering (OIDC / JWT / XID)
+# Alt 2.1: Auth-inventering (OIDC / JWT / XID)
 
 **Författare:** Mustafa Salahuddin  
-**Spår:** Alternativ 2 / Spår A — BankID & Freja eID (OIDC-broker)  
+**Spår:** Alternativ 2 / Spår A: BankID & Freja eID (OIDC-broker)  
 **Datum:** 2026-08-18  
 **Status:** Klar (Alt 2.1)  
 **Branch:** `feature/eid-auth-inventory`  
@@ -9,7 +9,7 @@
 
 ## Syfte
 
-Kartlägga befintlig autentisering i Polis och var en svensk e-legitimation (BankID/Freja via OIDC-broker, t.ex. Idura) naturligt hakar in — utan att implementera eID ännu.
+Kartlägga befintlig autentisering i Polis och var en svensk e-legitimation (BankID/Freja via OIDC-broker, t.ex. Idura) naturligt hakar in, utan att implementera eID ännu.
 
 ## Befintlig arkitektur (kort)
 
@@ -21,28 +21,28 @@ Kartlägga befintlig autentisering i Polis och var en svensk e-legitimation (Ban
 | Deltagare (anonym) | Ingen inloggning | **Anonymous JWT** efter första röst/kommentar |
 | Legacy | Cookie `pc` | Migreras till JWT |
 
-**Middleware:** `server/src/auth/hybrid-jwt.ts` — prioritet: XID JWT → Anonymous JWT → Standard User JWT → OIDC JWT → legacy cookie.
+**Middleware:** `server/src/auth/hybrid-jwt.ts`. Prioritet: XID JWT → Anonymous JWT → Standard User JWT → OIDC JWT → legacy cookie.
 
 **Nyckel docs:** `server/docs/authentication.md`, `client-participation-alpha/XID-IMPLEMENTATION.md`, `client-participation-alpha/README-AUTH.md`.
 
 **Nyckelfiler:**
 
-- Server: `hybrid-jwt.ts`, `xid-jwt.ts`, `standard-user-jwt.ts`, `anonymous-jwt.ts`, `oidc_user_mappings`
-- Alpha: `src/lib/auth.ts`, `src/lib/net.ts`, `XidOidcConflictWarning`
-- Dev OIDC: `AUTH_ISSUER=https://localhost:3000/` (simulator), `AUTH_CLIENT_ID`, JWKS
+* Server: `hybrid-jwt.ts`, `xid-jwt.ts`, `standard-user-jwt.ts`, `anonymous-jwt.ts`, `oidc_user_mappings`
+* Alpha: `src/lib/auth.ts`, `src/lib/net.ts`, `XidOidcConflictWarning`
+* Dev OIDC: `AUTH_ISSUER=https://localhost:3000/` (simulator), `AUTH_CLIENT_ID`, JWKS
 
 ## Var eID (OIDC-broker) bör hakas in
 
-Enligt praktikplanen (A1 — huvudleverans): **OIDC-broker för deltagare** (alpha + server), inte native BankID SDK.
+Enligt praktikplanen är A1 huvudleveransen: **OIDC-broker för deltagare** (alpha + server), inte native BankID SDK.
 
 | Lager | Vad som behövs |
 |-------|----------------|
 | **Organisation** | Idura (eller liknande) sandbox: klient, redirect URI, testanvändare BankID/Freja |
 | **Env** | Pekar `AUTH_ISSUER` / JWKS mot broker (samma mönster som dagens OIDC) |
-| **Server** | Claim-mapping: broker `sub` → `oidc_user_mappings` / uid; **ingen lagring av personnummer** — endast `sub` (+ ev. hashad pseudonym). Ev. `acr`/`amr` för LOA (A4, valfritt) |
+| **Server** | Claim-mapping: broker `sub` → `oidc_user_mappings` / uid; **ingen lagring av personnummer**, endast `sub` (+ ev. hashad pseudonym). Ev. `acr`/`amr` för LOA (A4, valfritt) |
 | **Alpha** | Inloggningsknapp → AuthProvider / OIDC redirect; efter login: Polis-deltagar-JWT som idag för standard users |
 | **Policy** | Konversation: `xid_required` / whitelist idag; ny flagga t.ex. `eid_required` eller återanvänd OIDC-krav |
-| **Konflikt** | XID + OIDC samtidigt — redan varnad i UI; eID-login måste ha tydlig regel (eID vinner / XID förbjuden / etc.) |
+| **Konflikt** | XID + OIDC samtidigt: varning finns redan i UI; eID-login måste ha tydlig regel (eID vinner / XID förbjuden / etc.) |
 
 ### Rekommenderad integrationsväg (från praktikplan)
 
@@ -58,18 +58,18 @@ Enligt praktikplanen (A1 — huvudleverans): **OIDC-broker för deltagare** (alp
 
 | Aktivitet | Lokalt nu | Kräver org/broker |
 |-----------|-----------|-------------------|
-| Lära OIDC/JWT/XID-flöden | Ja — simulator + JWT-keys | — |
-| Spike mot Idura sandbox | Delvis (när konto finns) | Ja — Idura-avtal/sandbox |
-| Riktig BankID/Freja-login | Nej | Ja — broker + test-eID |
-| Cypress E2E med eID-testusers | Nej | Ja — sandbox testusers |
+| Lära OIDC/JWT/XID-flöden | Ja, simulator + JWT-keys | Inte tillämpligt |
+| Spike mot Idura sandbox | Delvis (när konto finns) | Ja, Idura-avtal/sandbox |
+| Riktig BankID/Freja-login | Nej | Ja, broker + test-eID |
+| Cypress E2E med eID-testusers | Nej | Ja, sandbox testusers |
 | Produktion | Nej | Swedbank-godkännande via Idura (lång ledtid) |
 
 ## Risker (kort)
 
-- GDPR / personnummer — dataminimering (bara broker-sub)
-- XID vs OIDC i embed-scenarier
-- Blocker: Idura-konto måste lösas av organisationen
-- Admin OIDC och deltagar-eID kan dela broker men ha olika klienter/claims
+* GDPR / personnummer: dataminimering (bara broker-sub)
+* XID vs OIDC i embed-scenarier
+* Blocker: Idura-konto måste lösas av organisationen
+* Admin OIDC och deltagar-eID kan dela broker men ha olika klienter/claims
 
 ## Nästa steg (Alt 2.2)
 
@@ -80,7 +80,7 @@ Enligt praktikplanen (A1 — huvudleverans): **OIDC-broker för deltagare** (alp
 
 ## Checklista Alt 2.1
 
-- [x] Läst `server/docs/authentication.md`
-- [x] Förstått admin OIDC vs participant JWT vs anonym/XID
-- [x] Noterat var eID hakar in (broker → OIDC → standard user JWT i alpha)
-- [x] Denna inventeringsanteckning
+* [x] Läst `server/docs/authentication.md`
+* [x] Förstått admin OIDC vs participant JWT vs anonym/XID
+* [x] Noterat var eID hakar in (broker → OIDC → standard user JWT i alpha)
+* [x] Denna inventeringsanteckning
