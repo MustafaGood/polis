@@ -1,5 +1,5 @@
 import { Heading, Box, Text, Button, Select } from 'theme-ui'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 
 import { useConversationData } from '../../util/conversation_data'
@@ -9,6 +9,7 @@ import Spinner from '../framework/Spinner'
 
 const InviteCodes = () => {
   const params = useParams()
+  const id = useId()
   const conversationData = useConversationData()
   const enabled = Boolean(conversationData?.treevite_enabled)
   const conversationId = useMemo(
@@ -210,8 +211,14 @@ const InviteCodes = () => {
             <Text sx={{ fontWeight: 'bold', mb: [2] }}>Filters</Text>
             <Box sx={{ display: 'flex', gap: [3], alignItems: 'end', flexWrap: 'wrap' }}>
               <Box>
-                <Text sx={{ display: 'block', mb: [1], fontSize: [1] }}>Wave</Text>
+                <Text
+                  as="label"
+                  htmlFor={`${id}-wave`}
+                  sx={{ display: 'block', mb: [1], fontSize: [1] }}>
+                  Wave
+                </Text>
                 <Select
+                  id={`${id}-wave`}
                   value={waveFilter}
                   onChange={(e) => setWaveFilter(e.target.value)}
                   sx={{ minWidth: '120px' }}>
@@ -225,8 +232,14 @@ const InviteCodes = () => {
               </Box>
 
               <Box>
-                <Text sx={{ display: 'block', mb: [1], fontSize: [1] }}>Status</Text>
+                <Text
+                  as="label"
+                  htmlFor={`${id}-status`}
+                  sx={{ display: 'block', mb: [1], fontSize: [1] }}>
+                  Status
+                </Text>
                 <Select
+                  id={`${id}-status`}
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   sx={{ minWidth: '140px' }}>

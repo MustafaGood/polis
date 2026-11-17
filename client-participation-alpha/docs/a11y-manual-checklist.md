@@ -92,7 +92,10 @@ _Om treevite/invite krävs._
 
 ---
 
-## Sammanfattning (fylls i Vecka 11–12)
+## Historisk sammanfattning (kod och automatiserade kontroller)
+
+Denna sammanfattning är inte ett resultat av de manuella kontrollerna ovan.
+Deras status är fortfarande "Ej testat" tills resultat och testmiljö registreras.
 
 | Område           | Status           | Blockerande fynd                   |
 | ---------------- | ---------------- | ---------------------------------- |

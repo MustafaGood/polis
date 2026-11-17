@@ -31,6 +31,7 @@ export default function PCAVisualization({
   const [selectedStatement, setSelectedStatement] = useState<SelectedStatement | null>(null)
   const [userPid, setUserPid] = useState<number | null>(null)
   const vizTitleId = useId()
+  const vizDescriptionId = useId()
 
   // Get current user's PID
   useEffect(() => {
@@ -67,6 +68,12 @@ export default function PCAVisualization({
     selectedStatement?.tid ?? null,
     userPid
   )
+  const visualizationDescription = hulls
+    .map(
+      ({ groupId, participantCount }) =>
+        `${s.group_123} ${groupLetters[groupId] ?? groupId}, ${participantCount}`
+    )
+    .join('; ')
 
   // Find the comment text for the selected statement
   const selectedComment = useMemo(() => {
@@ -118,8 +125,10 @@ export default function PCAVisualization({
         viewBox={`0 0 ${width} ${height}`}
         role="img"
         aria-labelledby={vizTitleId}
+        aria-describedby={vizDescriptionId}
       >
         <title id={vizTitleId}>{s.opinionGroups}</title>
+        <desc id={vizDescriptionId}>{visualizationDescription || s.opinionGroups}</desc>
         <Group left={margin.left} top={margin.top}>
           {/* Origin lines */}
           {originX >= 0 && originX <= xMax && (

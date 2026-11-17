@@ -33,7 +33,7 @@ jobs:
         working-directory: client-participation-alpha
 
       - name: Check formatting
-        run: npm run format -- --check
+        run: npx prettier --check .
         working-directory: client-participation-alpha
 
       - name: Run linter

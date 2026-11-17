@@ -10,6 +10,7 @@ const XidAllowListTable = ({ conversationId }) => {
   const [xids, setXids] = useState([])
   const [pagination, setPagination] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [hasLoaded, setHasLoaded] = useState(false)
   const [error, setError] = useState(null)
   const [limit] = useState(50)
   const [downloadLoading, setDownloadLoading] = useState(false)
@@ -29,6 +30,7 @@ const XidAllowListTable = ({ conversationId }) => {
 
       setXids(res?.xids || [])
       setPagination(res?.pagination || null)
+      setHasLoaded(true)
     } catch (e) {
       setError(e?.responseText || e?.message || 'Failed to load XID Allow List')
     } finally {
@@ -106,44 +108,12 @@ const XidAllowListTable = ({ conversationId }) => {
     }
   }
 
-  if (loading && !xids.length) {
+  if (loading && !hasLoaded && !xids.length) {
     return <Spinner />
   }
 
-  if (error) {
+  if (error && !hasLoaded) {
     return <Text sx={{ color: 'error', mb: [3] }}>{error}</Text>
-  }
-
-  if (xids.length === 0) {
-    return (
-      <>
-        <Flex sx={{ justifyContent: 'flex-end', mb: [2], gap: [2] }}>
-          <Button
-            variant="outline"
-            size="small"
-            onClick={() => setIsUploadModalOpen(true)}
-            disabled={!conversationId}>
-            Upload XIDs
-          </Button>
-          <Button
-            variant="outline"
-            size="small"
-            onClick={handleDownloadCsv}
-            disabled={downloadLoading || !conversationId}>
-            {downloadLoading ? 'Preparing…' : 'Download CSV'}
-          </Button>
-        </Flex>
-        <UploadXidsModal
-          isOpen={isUploadModalOpen}
-          onClose={() => setIsUploadModalOpen(false)}
-          onUpload={handleUploadXids}
-          conversationId={conversationId}
-        />
-        <Text sx={{ color: 'mediumGray', mb: [3] }}>
-          No XIDs in the allow list for this conversation.
-        </Text>
-      </>
-    )
   }
 
   return (
@@ -170,87 +140,99 @@ const XidAllowListTable = ({ conversationId }) => {
         onUpload={handleUploadXids}
         conversationId={conversationId}
       />
-      <Box
-        as="table"
-        sx={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          mb: [3]
-        }}>
-        <Box
-          as="thead"
-          sx={{
-            backgroundColor: 'lightGray',
-            borderBottom: '2px solid',
-            borderColor: 'mediumGray'
-          }}>
-          <Box as="tr">
+      {error ? (
+        <Text sx={{ color: 'error', mb: [3] }}>{error}</Text>
+      ) : loading && !xids.length ? (
+        <Spinner />
+      ) : xids.length === 0 ? (
+        <Text sx={{ color: 'mediumGray', mb: [3] }}>
+          No XIDs in the allow list for this conversation.
+        </Text>
+      ) : (
+        <>
+          <Box
+            as="table"
+            sx={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              mb: [3]
+            }}>
             <Box
-              as="th"
+              as="thead"
               sx={{
-                px: [2, 3],
-                py: [2],
-                textAlign: 'left',
-                fontWeight: 'bold',
-                fontSize: [1],
-                borderRight: '1px solid',
+                backgroundColor: 'lightGray',
+                borderBottom: '2px solid',
                 borderColor: 'mediumGray'
               }}>
-              PID
+              <Box as="tr">
+                <Box
+                  as="th"
+                  sx={{
+                    px: [2, 3],
+                    py: [2],
+                    textAlign: 'left',
+                    fontWeight: 'bold',
+                    fontSize: [1],
+                    borderRight: '1px solid',
+                    borderColor: 'mediumGray'
+                  }}>
+                  PID
+                </Box>
+                <Box
+                  as="th"
+                  sx={{
+                    px: [2, 3],
+                    py: [2],
+                    textAlign: 'left',
+                    fontWeight: 'bold',
+                    fontSize: [1]
+                  }}>
+                  XID
+                </Box>
+              </Box>
             </Box>
-            <Box
-              as="th"
-              sx={{
-                px: [2, 3],
-                py: [2],
-                textAlign: 'left',
-                fontWeight: 'bold',
-                fontSize: [1]
-              }}>
-              XID
+            <Box as="tbody">
+              {xids.map((xidRecord, index) => (
+                <Box
+                  key={`${xidRecord.xid}-${index}`}
+                  as="tr"
+                  sx={{
+                    borderBottom: '1px solid',
+                    borderColor: 'lightGray',
+                    '&:hover': {
+                      backgroundColor: 'lightGray'
+                    }
+                  }}>
+                  <Box
+                    as="td"
+                    sx={{
+                      px: [2, 3],
+                      py: [2],
+                      fontSize: [1],
+                      borderRight: '1px solid',
+                      borderColor: 'lightGray',
+                      color: xidRecord.pid ? 'text' : 'mediumGray',
+                      fontStyle: xidRecord.pid ? 'normal' : 'italic'
+                    }}>
+                    {xidRecord.pid ?? '—'}
+                  </Box>
+                  <Box
+                    as="td"
+                    sx={{
+                      px: [2, 3],
+                      py: [2],
+                      fontSize: [1],
+                      wordBreak: 'break-all'
+                    }}>
+                    {xidRecord.xid}
+                  </Box>
+                </Box>
+              ))}
             </Box>
           </Box>
-        </Box>
-        <Box as="tbody">
-          {xids.map((xidRecord, index) => (
-            <Box
-              key={`${xidRecord.xid}-${index}`}
-              as="tr"
-              sx={{
-                borderBottom: '1px solid',
-                borderColor: 'lightGray',
-                '&:hover': {
-                  backgroundColor: 'lightGray'
-                }
-              }}>
-              <Box
-                as="td"
-                sx={{
-                  px: [2, 3],
-                  py: [2],
-                  fontSize: [1],
-                  borderRight: '1px solid',
-                  borderColor: 'lightGray',
-                  color: xidRecord.pid ? 'text' : 'mediumGray',
-                  fontStyle: xidRecord.pid ? 'normal' : 'italic'
-                }}>
-                {xidRecord.pid ?? '—'}
-              </Box>
-              <Box
-                as="td"
-                sx={{
-                  px: [2, 3],
-                  py: [2],
-                  fontSize: [1],
-                  wordBreak: 'break-all'
-                }}>
-                {xidRecord.xid}
-              </Box>
-            </Box>
-          ))}
-        </Box>
-      </Box>
-      <Pagination pagination={pagination} onPageChange={handlePageChange} loading={loading} />
+          <Pagination pagination={pagination} onPageChange={handlePageChange} loading={loading} />
+        </>
+      )}
     </>
   )
 }

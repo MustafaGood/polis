@@ -2,13 +2,29 @@
  * Alpha client accessibility smoke (cypress-axe)
  *
  * Checks critical/serious axe violations on the participation voting UI.
- * Uses a known conversation so setup does not depend on admin OIDC login.
- *
- * Override with CYPRESS_A11Y_CONVERSATION_ID if needed.
+ * Creates a seeded conversation unless CYPRESS_A11Y_CONVERSATION_ID is set.
  */
 
+import {
+  createTestConversation,
+  addCommentToConversation,
+} from '../../support/conversation-helpers.js'
+
 describe('Alpha Client: Accessibility smoke', function () {
-  const conversationId = Cypress.env('A11Y_CONVERSATION_ID') || '52czbnk3jn'
+  let conversationId
+
+  before(function () {
+    conversationId = Cypress.env('A11Y_CONVERSATION_ID')
+    if (conversationId) return
+
+    createTestConversation({
+      topic: 'Accessibility smoke test',
+      description: 'Seeded conversation for accessibility tests',
+    }).then((id) => {
+      conversationId = id
+      return addCommentToConversation(id, 'A statement for accessibility testing')
+    })
+  })
 
   beforeEach(function () {
     cy.clearAllLocalStorage()

@@ -78,6 +78,7 @@ export function VisualizationControls({
               key={`group-selector-${groupId}`}
               className="vis-control-btn"
               type="button"
+              aria-label={`${s.group_123} ${letter}`}
               onClick={() => {
                 // Toggle group selection
                 onGroupSelect(isGroupSelected ? null : groupId)
@@ -145,12 +146,17 @@ export function VisualizationControls({
                   (typeof context === 'object' &&
                     typeof selectedStatement.context === 'object' &&
                     selectedStatement.context.groupId === context.groupId))
+              const contextLabel =
+                context === 'consensus'
+                  ? s.consensus
+                  : `${s.group_123} ${groupLetters[context.groupId] ?? context.groupId}`
 
               return (
                 <button
                   key={`statement-${statement.tid}`}
                   className="vis-control-btn"
                   type="button"
+                  aria-label={`${s.comment_123} ${statement.tid}, ${contextLabel}`}
                   onClick={() => {
                     // Toggle selection
                     if (isSelected) {

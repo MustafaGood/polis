@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useId, useState } from 'react'
 import { uiLanguage } from '../lib/lang'
 import type { Translations } from '../strings/types'
 import InfoIcon from './icons/InfoIcon'
@@ -27,6 +27,7 @@ export function Statement({
 }: StatementProps) {
   const [showImportanceDesc, setShowImportanceDesc] = useState<boolean>(false)
   const [translationsEnabled, setTranslationsEnabled] = useState<boolean>(false)
+  const importanceCheckboxId = useId()
 
   // Get current user language
   const currentLang = uiLanguage()
@@ -162,9 +163,9 @@ export function Statement({
       {importanceEnabled ? (
         <>
           <div className="importance-container">
-            <label htmlFor="important">{s.importantCheckbox}</label>
+            <label htmlFor={importanceCheckboxId}>{s.importantCheckbox}</label>
             <input
-              id="important"
+              id={importanceCheckboxId}
               type="checkbox"
               onChange={() => setIsStatmentImportant((prev) => !prev)}
               checked={isStatementImportant}

@@ -54,6 +54,18 @@ describe('CheckboxField', () => {
     expect(screen.getByText('This is a test checkbox')).toBeInTheDocument()
   })
 
+  it('uses the visible text as a clickable label even without a label prop', () => {
+    actions.handleConversationDataUpdate.mockReturnValue({ type: 'TEST' })
+    renderWithProviders(
+      <CheckboxField field="strict_moderation">No comments without approval</CheckboxField>
+    )
+    expect(
+      screen.getByRole('checkbox', { name: 'No comments without approval' })
+    ).toBeInTheDocument()
+    fireEvent.click(screen.getByText('No comments without approval'))
+    expect(actions.handleConversationDataUpdate).toHaveBeenCalled()
+  })
+
   it('displays checkbox with correct initial state', () => {
     const store = createMockStore({ is_active: true })
     renderWithProviders(

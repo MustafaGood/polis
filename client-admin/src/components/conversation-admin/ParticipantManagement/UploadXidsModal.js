@@ -1,5 +1,5 @@
 import { Box, Text, Button, Flex, Heading } from 'theme-ui'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect, useId } from 'react'
 import PropTypes from 'prop-types'
 
 /**
@@ -94,6 +94,59 @@ const UploadXidsModal = ({ isOpen, onClose, onUpload, conversationId }) => {
   const [replaceAll, setReplaceAll] = useState(false)
   const fileInputRef = useRef(null)
   const textareaRef = useRef(null)
+  const dialogRef = useRef(null)
+  const closeButtonRef = useRef(null)
+  const closeRef = useRef(null)
+  const id = useId()
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const previousFocus = document.activeElement
+    closeButtonRef.current?.focus()
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        closeRef.current()
+      } else if (event.key === 'Tab') {
+        const focusable = Array.from(
+          dialogRef.current.querySelectorAll(
+            'button:not([disabled]), input:not([disabled]):not([type="file"]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+          )
+        )
+        if (!focusable.length) {
+          event.preventDefault()
+          dialogRef.current.focus()
+        } else if (
+          event.shiftKey &&
+          (document.activeElement === focusable[0] ||
+            !dialogRef.current.contains(document.activeElement))
+        ) {
+          event.preventDefault()
+          focusable[focusable.length - 1].focus()
+        } else if (
+          !event.shiftKey &&
+          (document.activeElement === focusable[focusable.length - 1] ||
+            !dialogRef.current.contains(document.activeElement))
+        ) {
+          event.preventDefault()
+          focusable[0].focus()
+        }
+      }
+    }
+    const handleFocusIn = (event) => {
+      if (dialogRef.current && !dialogRef.current.contains(event.target)) {
+        closeButtonRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('focusin', handleFocusIn)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('focusin', handleFocusIn)
+      if (previousFocus?.isConnected) previousFocus.focus()
+    }
+  }, [isOpen])
 
   const handleFileRead = useCallback((file) => {
     if (!file) return
@@ -182,6 +235,7 @@ const UploadXidsModal = ({ isOpen, onClose, onUpload, conversationId }) => {
     setReplaceAll(false)
     onClose()
   }
+  closeRef.current = handleClose
 
   if (!isOpen) {
     return null
@@ -189,6 +243,11 @@ const UploadXidsModal = ({ isOpen, onClose, onUpload, conversationId }) => {
 
   return (
     <Box
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={`${id}-title`}
+      tabIndex={-1}
       sx={{
         position: 'fixed',
         top: 0,
@@ -227,6 +286,7 @@ const UploadXidsModal = ({ isOpen, onClose, onUpload, conversationId }) => {
           }}>
           <Heading
             as="h3"
+            id={`${id}-title`}
             sx={{
               fontSize: [3],
               lineHeight: 'body',
@@ -234,7 +294,12 @@ const UploadXidsModal = ({ isOpen, onClose, onUpload, conversationId }) => {
             }}>
             Upload XIDs
           </Heading>
-          <Button variant="outline" size="small" onClick={handleClose}>
+          <Button
+            ref={closeButtonRef}
+            aria-label="Close"
+            variant="outline"
+            size="small"
+            onClick={handleClose}>
             ✕
           </Button>
         </Flex>
@@ -247,12 +312,23 @@ const UploadXidsModal = ({ isOpen, onClose, onUpload, conversationId }) => {
           </Text>
 
           {/* Drop zone */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,.txt,.text"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+            tabIndex={-1}
+          />
           <Box
+            as="button"
+            type="button"
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             sx={{
               border: '2px dashed',
+              width: '100%',
               borderColor: isDragging ? 'primary' : 'mediumGray',
               borderRadius: 2,
               p: [3],
@@ -267,21 +343,18 @@ const UploadXidsModal = ({ isOpen, onClose, onUpload, conversationId }) => {
               }
             }}
             onClick={() => fileInputRef.current?.click()}>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv,.txt,.text"
-              onChange={handleFileSelect}
-              style={{ display: 'none' }}
-            />
             {isProcessing ? (
-              <Text sx={{ color: 'mediumGray' }}>Processing file...</Text>
+              <Text as="span" sx={{ display: 'block', color: 'mediumGray' }}>
+                Processing file...
+              </Text>
             ) : (
               <>
-                <Text sx={{ mb: [2], color: 'text', fontSize: [1] }}>
+                <Text as="span" sx={{ display: 'block', mb: [2], color: 'text', fontSize: [1] }}>
                   {isDragging ? 'Drop file here' : 'Click to browse or drag and drop file here'}
                 </Text>
-                <Text sx={{ color: 'mediumGray', fontSize: [0] }}>Supports CSV and text files</Text>
+                <Text as="span" sx={{ display: 'block', color: 'mediumGray', fontSize: [0] }}>
+                  Supports CSV and text files
+                </Text>
               </>
             )}
           </Box>
@@ -290,6 +363,7 @@ const UploadXidsModal = ({ isOpen, onClose, onUpload, conversationId }) => {
           <Box sx={{ mb: [3] }}>
             <Text
               as="label"
+              htmlFor={`${id}-xids`}
               sx={{
                 display: 'block',
                 mb: [2],
@@ -300,6 +374,7 @@ const UploadXidsModal = ({ isOpen, onClose, onUpload, conversationId }) => {
             </Text>
             <Box
               as="textarea"
+              id={`${id}-xids`}
               ref={textareaRef}
               value={xidsText}
               onChange={(e) => setXidsText(e.target.value)}
@@ -325,7 +400,7 @@ const UploadXidsModal = ({ isOpen, onClose, onUpload, conversationId }) => {
             <Box sx={{ flexShrink: 0, position: 'relative', top: -0.5 }}>
               <input
                 type="checkbox"
-                id="replaceAll"
+                id={`${id}-replace-all`}
                 checked={replaceAll}
                 onChange={(e) => setReplaceAll(e.target.checked)}
               />
@@ -340,7 +415,7 @@ const UploadXidsModal = ({ isOpen, onClose, onUpload, conversationId }) => {
               }}>
               <Text
                 as="label"
-                htmlFor="replaceAll"
+                htmlFor={`${id}-replace-all`}
                 sx={{
                   cursor: 'pointer',
                   fontSize: [1]
