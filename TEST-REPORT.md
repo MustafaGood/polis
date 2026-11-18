@@ -15,7 +15,7 @@ or to every pull-request branch.
 | Participant labels, focus, status, landmarks and form errors | Partial | Implemented and covered in part by existing component tests; complete keyboard and screen-reader journeys remain to be assessed. |
 | Dialog keyboard behavior | Partial | Participant regression tests cover Tab, Escape, clipboard feedback and focus restoration even when the invite form disappears; verify live participant and admin flows. |
 | PCA alternative and controls | Partial | Group counts, controls and a table of displayed statement vote counts are available; the plot geometry and user position still lack equivalent text, and manual assessment remains. |
-| jest-axe and cypress-axe | Partial | Tests and CI workflows exist. The Cypress smoke tests cover only the voting card and submission form; the updated seeded setup still needs an isolated-stack run. |
+| jest-axe and cypress-axe | Partial | Cypress checks for voting, keyboard focus and the submission form passed with mock APIs; the seeded setup still needs a dedicated real-stack run and CI verification. |
 | Report-client jsx-a11y lint and triage | Partial | A separate lint command found 23 accessibility-rule errors; full visualization remediation is outside the plan. |
 | Admin checkboxes, dialogs and tables | Partial | Accessibility changes exist; verify all relevant names, keyboard flows and table relationships manually. |
 | Manual NVDA/VoiceOver, keyboard and i18n assessment | Missing | Individual entries in the existing manual checklist are marked untested. Historical code/axe summaries are not a manual assessment. |
@@ -35,6 +35,12 @@ a claim that CI is green.
 
 ## Test results
 
+- Cypress accessibility smoke: four tests passed twice in an isolated copy
+  of the participant app with mock API responses. They cover axe checks for
+  the voting card and form, keyboard focus order and an intercepted duplicate
+  submission error. This did not test the seeded-conversation setup, real
+  server/database integration or CI. The test exposed insufficient button
+  contrast, which was corrected and checked in the passing runs.
 - Latest participant changes: `npm test -- --runInBand` passed (16 suites,
   125 tests) and `npm run lint` passed. Jest exercises the invite-to-dialog
   focus handoff, clipboard feedback, dialog description and the PCA vote-count
@@ -48,8 +54,8 @@ a claim that CI is green.
   voting controls, the three forms, and focus after code login. No real
   conversation data was submitted. Real end-to-end flows and screen-reader
   announcements still need assessment.
-- E2E smoke spec: focused Prettier and ESLint checks passed; the Cypress
-  execution with the new seeded setup has not been run on an isolated stack.
+- E2E smoke spec: the Cypress execution with the seeded setup has not been run
+  on a dedicated real stack.
 - Participant: `npm test -- --runInBand` passed (15 suites, 103 tests);
   `npm run lint` passed. `npm run verify` and `npm run build` passed in an
   isolated copy without local environment files, where verify automatically

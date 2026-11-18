@@ -45,8 +45,10 @@ From `e2e`, after installing dependencies and configuring the local trusted CA:
 npm run test:a11y
 ```
 
-The smoke test creates a seeded conversation via the existing simulator
-helpers. To use an existing test conversation instead, set
+The smoke test checks the voting card and form with axe, keyboard focus order,
+and an intercepted duplicate-submission error. It creates a seeded
+conversation via the existing simulator helpers. To use an existing test
+conversation instead, set
 `CYPRESS_A11Y_CONVERSATION_ID`; the conversation must already contain a
 visible statement and permit the participant flow. The npm script uses POSIX
 shell syntax, so on Windows use a compatible shell or set `NODE_EXTRA_CA_CERTS`
