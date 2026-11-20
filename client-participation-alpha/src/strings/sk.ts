@@ -41,7 +41,7 @@ s.commentSent =
   "Komentár úspešne pridaný! Váš názor a to ako ste hlasovali uvidia len ostatní diskutujúci."
 s.helpWriteListIntro = "Čo tvorí dobrý komentár?"
 s.helpWriteListRaisNew = "Originálna perspektíva, či prehliadaný uhol pohľadu na vec"
-s.helpWriteListShort = "Zreteľný návrh a stručné odôvodnenie (maximálne 140 znakov)"
+s.helpWriteListShort = "Zreteľný návrh a stručné odôvodnenie (maximálne 400 znakov)"
 s.helpWriteListStandalone = "Samostatná myšlienka"
 s.submitComment = "Zdieľať"
 s.tipCommentsRandom =

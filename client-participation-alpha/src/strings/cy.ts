@@ -39,7 +39,7 @@ s.commentSent =
   "Cyflwynwyd eich datganiad! Dim ond cyfranogwyr eraill fydd yn gweld eich datganiad ac yn cytuno neu'n anghytuno."
 s.helpWriteListIntro = "Beth sy'n gwneud datganiad da?"
 s.helpWriteListRaisNew = "Codwch safbwyntiau, profiadau neu faterion newydd"
-s.helpWriteListShort = "Clir a chryno (wedi'i gyfyngu i 140 nod)"
+s.helpWriteListShort = "Clir a chryno (wedi'i gyfyngu i 400 nod)"
 s.helpWriteListStandalone = "Syniad ar ei ben ei hun"
 s.submitComment = "Cyflwyno"
 s.tipCommentsRandom =

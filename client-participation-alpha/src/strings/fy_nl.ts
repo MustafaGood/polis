@@ -38,13 +38,13 @@ s.commentSendFailed = "Der wie in flater by it tafoegjen fan jo reaksje."
 s.commentSent = "Reaksje ferstjoerd! Oare dielnimmers sille jo reaksje sjen en akkoard wêze of net."
 s.helpWriteListIntro = "Wat is in goed foarstel?"
 s.helpWriteListRaisNew = "Kaart nije perspektiven, ûnderfiningen of problemen oan"
-s.helpWriteListShort = "Dúdlik en koart (beheind ta 140 tekens)"
+s.helpWriteListShort = "Dúdlik en koart (beheind ta 400 tekens)"
 s.helpWriteListStandalone = "In idee dat op himsels stiet"
 s.submitComment = "Reagearje"
 s.tipCommentsRandom = "Reaksjes binne troch inoar sortearre. Jo binne op net ien oan it reagearjen"
 s.writePrompt = "Diel jo miening…"
 s.writeCommentHelpText =
-  "<strong>skriuw</strong> in reaksje as jo miening net fertsjinwurdige wurdt</i>"
+  "<strong>skriuw</strong> in reaksje as jo miening net fertsjinwurdige wurdt"
 
 // ─────────────────────────────────────────────────────────────
 // Visualization

@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react'
 import { jwtDecode } from 'jwt-decode'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
+import { getOidcApiToken } from './oidcToken'
 
 const UserContext = createContext(null)
 
@@ -28,10 +29,8 @@ export const hasDelphiEnabled = (authUser) => {
 }
 
 export const decodedJwt = (authUser) => {
-  if (authUser && authUser?.access_token) {
-    return jwtDecode(authUser.access_token)
-  }
-  return null
+  const token = getOidcApiToken(authUser, process.env.AUTH_ISSUER)
+  return token ? jwtDecode(token) : null
 }
 
 const getAdminUids = () => {

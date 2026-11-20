@@ -117,6 +117,42 @@ describe("Conversation Update API", () => {
     expect(conversation.profanity_filter).toBe(true);
   });
 
+  test("should update eID requirement and reject combining it with XID rules", async () => {
+    const enableEidResponse = await updateConversation(agent, {
+      conversation_id: conversationId,
+      eid_required: true,
+    });
+
+    expect(enableEidResponse.status).toBe(200);
+
+    const conversationResponse: Response = await agent.get(
+      `/api/v3/conversations?conversation_id=${conversationId}`
+    );
+    expect(conversationResponse.body.eid_required).toBe(true);
+
+    const enableXidResponse = await updateConversation(agent, {
+      conversation_id: conversationId,
+      xid_required: true,
+    });
+    expect(enableXidResponse.status).toBe(400);
+    expect(enableXidResponse.text).toContain("polis_err_eid_xid_conflict");
+  });
+
+  test("should reject enabling eID when XID is already required", async () => {
+    const enableXidResponse = await updateConversation(agent, {
+      conversation_id: conversationId,
+      xid_required: true,
+    });
+    expect(enableXidResponse.status).toBe(200);
+
+    const enableEidResponse = await updateConversation(agent, {
+      conversation_id: conversationId,
+      eid_required: true,
+    });
+    expect(enableEidResponse.status).toBe(400);
+    expect(enableEidResponse.text).toContain("polis_err_eid_xid_conflict");
+  });
+
   test("should update appearance settings", async () => {
     // Update appearance settings
     const updateData: ConversationUpdateData = {

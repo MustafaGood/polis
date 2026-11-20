@@ -8,6 +8,7 @@
     "start": "webpack serve --config webpack.dev.js",
     "lint": "eslint --quiet .",
     "lint:verbose": "eslint .",
+    "lint:a11y": "eslint --ext .js,.jsx -c .eslintrc.a11y.yml .",
     "test": "jest"
   },
   "author": "Colin Megill",
@@ -27,6 +28,7 @@
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.8.1",
     "eslint": "~8.35.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "~7.32.2",
     "event-hooks-webpack-plugin": "^2.3.0",
     "glob": "~10.5.0",

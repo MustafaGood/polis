@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import { handleConversationDataUpdate } from '../../actions'
 import { useConversationData } from '../../util/conversation_data'
 
-export const CheckboxField = ({ field, label = '', children, isIntegerBool = false }) => {
+export const CheckboxField = ({ field, children, isIntegerBool = false }) => {
   const conversationData = useConversationData()
   const initialState = isIntegerBool
     ? Number(conversationData[field]) === 1
@@ -33,11 +33,10 @@ export const CheckboxField = ({ field, label = '', children, isIntegerBool = fal
   }
 
   return (
-    <Flex sx={{ alignItems: 'flex-start', mb: [3] }}>
+    <Flex as="label" sx={{ alignItems: 'flex-start', mb: [3] }}>
       <Box sx={{ flexShrink: 0, position: 'relative', top: -0.5 }}>
         <input
           type="checkbox"
-          label={label}
           data-testid={field}
           checked={
             isIntegerBool ? Number(conversationData[field]) === 1 : Boolean(conversationData[field])

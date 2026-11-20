@@ -10,6 +10,7 @@ import TopicAgenda from '../components/topicAgenda/TopicAgenda'
 import TreeviteInvites from '../components/TreeviteInvites'
 import TreeviteLoginCodeModal from '../components/TreeviteLoginCodeModal'
 import VisualizationContainer from '../components/VisualizationContainer'
+import OidcAuthIsland from '../components/OidcAuthIsland'
 import XidOidcConflictWarning from '../components/XidOidcConflictWarning'
 import PolisLogo from '../components/icons/PolisLogo'
 import Layout from '../pages/layouts/Layout.astro'
@@ -83,6 +84,8 @@ try {
   // Handle specific error cases
   if (errorResponseText.includes('polis_err_xid_required')) {
     fetchError = s.xidRequired
+  } else if (errorResponseText.includes('polis_err_eid_required')) {
+    fetchError = s.eidRequired
   } else {
     fetchError = s.couldNotLoadConversation.replace('{{error}}', errorMessage)
   }
@@ -149,6 +152,7 @@ const hideHeader = Astro.url.searchParams.get('hide_header');
   <div class="container">
     {hideHeader ? null : <Header />}
     
+    <OidcAuthIsland client:only="react" s={s as Translations} />
     <XidOidcConflictWarning client:load s={s as Translations} />
 
     {fetchError ? (

@@ -295,7 +295,7 @@ describe('InviteCodes', () => {
         renderWithProviders(<InviteCodes />, { store })
 
         await waitFor(() => {
-          expect(screen.getByText('Wave')).toBeInTheDocument()
+          expect(screen.getByRole('combobox', { name: 'Wave' })).toBeInTheDocument()
           expect(screen.getByText('All waves')).toBeInTheDocument()
         })
       })
@@ -309,7 +309,7 @@ describe('InviteCodes', () => {
         renderWithProviders(<InviteCodes />, { store })
 
         await waitFor(() => {
-          expect(screen.getByText('Status')).toBeInTheDocument()
+          expect(screen.getByRole('combobox', { name: 'Status' })).toBeInTheDocument()
           expect(screen.getByText('All statuses')).toBeInTheDocument()
         })
       })
@@ -328,8 +328,7 @@ describe('InviteCodes', () => {
           expect(screen.getByText('Filters')).toBeInTheDocument()
         })
 
-        const selects = screen.getAllByRole('combobox')
-        fireEvent.change(selects[0], { target: { value: '1' } })
+        fireEvent.change(screen.getByRole('combobox', { name: 'Wave' }), { target: { value: '1' } })
 
         // Wait for the filtered results to appear
         await waitFor(() => {
@@ -350,8 +349,9 @@ describe('InviteCodes', () => {
         renderWithProviders(<InviteCodes />, { store })
 
         await waitFor(() => {
-          const selects = screen.getAllByRole('combobox')
-          fireEvent.change(selects[1], { target: { value: '0' } })
+          fireEvent.change(screen.getByRole('combobox', { name: 'Status' }), {
+            target: { value: '0' }
+          })
         })
 
         await waitFor(() => {

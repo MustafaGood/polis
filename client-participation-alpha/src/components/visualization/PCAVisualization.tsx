@@ -1,5 +1,5 @@
 import { Group } from '@visx/group'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import type { Comment, PCAData } from '../../api/types'
 import { getConversationToken } from '../../lib/auth'
 import type { Translations } from '../../strings/types'
@@ -9,7 +9,7 @@ import { StatementInfo } from './StatementInfo'
 import { UserPositionIndicator } from './UserPositionIndicator'
 import { VisualizationControls } from './VisualizationControls'
 import { VoteBarCharts } from './VoteBarCharts'
-import { height, margin, width, xMax, yMax } from './constants'
+import { height, margin, width, xMax, yMax, groupLetters } from './constants'
 import type { SelectedStatement, StatementContext, StatementWithType } from './types'
 import { useVisualizationData } from './useVisualizationData'
 
@@ -30,6 +30,8 @@ export default function PCAVisualization({
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null)
   const [selectedStatement, setSelectedStatement] = useState<SelectedStatement | null>(null)
   const [userPid, setUserPid] = useState<number | null>(null)
+  const vizTitleId = useId()
+  const vizDescriptionId = useId()
 
   // Get current user's PID
   useEffect(() => {
@@ -65,6 +67,15 @@ export default function PCAVisualization({
     isConsensusSelected,
     selectedStatement?.tid ?? null,
     userPid
+  )
+  const visualizationDescription = hulls
+    .map(
+      ({ groupId, participantCount }) =>
+        `${s.group_123} ${groupLetters[groupId] ?? groupId}, ${participantCount}`
+    )
+    .join('; ')
+  const displayedVoteData = groupVoteData.filter(
+    (vote) => vote.total > 0 && hulls.some((hull) => hull.groupId === vote.groupId && hull.center)
   )
 
   // Find the comment text for the selected statement
@@ -115,7 +126,12 @@ export default function PCAVisualization({
         height={height}
         style={{ maxWidth: '100%', height: 'auto' }}
         viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-labelledby={vizTitleId}
+        aria-describedby={vizDescriptionId}
       >
+        <title id={vizTitleId}>{s.opinionGroups}</title>
+        <desc id={vizDescriptionId}>{visualizationDescription || s.opinionGroups}</desc>
         <Group left={margin.left} top={margin.top}>
           {/* Origin lines */}
           {originX >= 0 && originX <= xMax && (
@@ -167,6 +183,47 @@ export default function PCAVisualization({
         onStatementSelect={handleStatementSelect}
         s={s}
       />
+
+      {/* Accessible text for current selection (not only in SVG) */}
+      {(isConsensusSelected || selectedGroup !== null) && (
+        <p
+          role="status"
+          style={{
+            marginTop: '1rem',
+            color: 'var(--color-text)',
+            fontSize: '0.95rem'
+          }}
+        >
+          {isConsensusSelected
+            ? s.consensus
+            : `${s.group_123} ${groupLetters[selectedGroup!] ?? selectedGroup}`}
+          {selectedStatement ? ` ${s.comment_123} ${selectedStatement.tid}` : null}
+        </p>
+      )}
+
+      {selectedStatement && displayedVoteData.length > 0 && (
+        <table style={{ width: '100%', tableLayout: 'fixed', overflowWrap: 'anywhere' }}>
+          <caption>{`${s.comment_123} ${selectedStatement.tid}`}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{s.group_123}</th>
+              <th scope="col">{s.agree}</th>
+              <th scope="col">{s.disagree}</th>
+              <th scope="col">{s.pass}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayedVoteData.map(({ groupId, agree, disagree, skip }) => (
+              <tr key={groupId}>
+                <th scope="row">{groupLetters[groupId] ?? groupId}</th>
+                <td>{agree}</td>
+                <td>{disagree}</td>
+                <td>{skip}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       {/* Statement info */}
       {(isConsensusSelected || selectedGroup !== null) && selectedStatement && (

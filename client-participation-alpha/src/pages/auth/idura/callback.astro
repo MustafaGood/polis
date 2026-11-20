@@ -1,0 +1,19 @@
+---
+import OidcAuthIsland from '../../../components/OidcAuthIsland'
+import Layout from '../../layouts/Layout.astro'
+import { uiLanguageSSR } from '../../../lib/lang'
+import { getTranslations } from '../../../strings/strings'
+
+const s = await getTranslations(
+  Astro.url.searchParams.get('ui_lang'),
+  Astro.request.headers.get('accept-language')
+)
+const lang = uiLanguageSSR(
+  Astro.url.searchParams.get('ui_lang'),
+  Astro.request.headers.get('accept-language')
+)
+---
+
+<Layout title="Polis sign-in" lang={lang} dir={s.direction || 'ltr'}>
+  <OidcAuthIsland client:only="react" s={s} />
+</Layout>

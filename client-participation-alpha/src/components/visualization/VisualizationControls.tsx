@@ -38,7 +38,9 @@ export function VisualizationControls({
       {/* Consensus button */}
       <button
         className="vis-control-btn"
+        type="button"
         onClick={onConsensusToggle}
+        aria-pressed={isConsensusSelected}
         style={{
           padding: '0.5rem 1rem',
           borderRadius: '8px',
@@ -69,40 +71,43 @@ export function VisualizationControls({
         <span style={{ color: 'var(--color-text)', fontSize: '0.95rem' }}>{s.group_123}</span>
         {hulls.map(({ groupId }) => {
           const color = groupColors[groupId] ?? '#999'
-          const letter = groupLetters[groupId] ?? ''
+          const letter = groupLetters[groupId] ?? String(groupId)
+          const isGroupSelected = selectedGroup === groupId
           return (
             <button
               key={`group-selector-${groupId}`}
               className="vis-control-btn"
+              type="button"
+              aria-label={`${s.group_123} ${letter}`}
               onClick={() => {
                 // Toggle group selection
-                onGroupSelect(selectedGroup === groupId ? null : groupId)
+                onGroupSelect(isGroupSelected ? null : groupId)
               }}
+              aria-pressed={isGroupSelected}
               style={{
                 padding: '0.5rem 1rem',
                 borderRadius: '8px',
-                border: selectedGroup === groupId ? '3px solid #000000' : '2px solid transparent',
-                backgroundColor: selectedGroup === groupId ? 'var(--color-button-bg)' : color,
-                color: selectedGroup === groupId ? 'var(--color-button-text)' : '#333333',
+                border: isGroupSelected ? '3px solid #000000' : '2px solid transparent',
+                backgroundColor: isGroupSelected ? 'var(--color-button-bg)' : color,
+                color: isGroupSelected ? 'var(--color-button-text)' : '#333333',
                 cursor: 'pointer',
                 fontSize: '0.95rem',
-                fontWeight: selectedGroup === groupId ? 700 : 600,
+                fontWeight: isGroupSelected ? 700 : 600,
                 transition:
                   'opacity 0.2s ease, transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease',
-                boxShadow:
-                  selectedGroup === groupId
-                    ? '0 0 0 3px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)'
-                    : 'none',
-                transform: selectedGroup === groupId ? 'scale(1.05)' : 'scale(1)'
+                boxShadow: isGroupSelected
+                  ? '0 0 0 3px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)'
+                  : 'none',
+                transform: isGroupSelected ? 'scale(1.05)' : 'scale(1)'
               }}
               onMouseEnter={(e) => {
-                if (selectedGroup !== groupId) {
+                if (!isGroupSelected) {
                   e.currentTarget.style.opacity = '0.85'
                   e.currentTarget.style.transform = 'scale(1.05)'
                 }
               }}
               onMouseLeave={(e) => {
-                if (selectedGroup !== groupId) {
+                if (!isGroupSelected) {
                   e.currentTarget.style.opacity = '1'
                   e.currentTarget.style.transform = 'scale(1)'
                 } else {
@@ -141,11 +146,17 @@ export function VisualizationControls({
                   (typeof context === 'object' &&
                     typeof selectedStatement.context === 'object' &&
                     selectedStatement.context.groupId === context.groupId))
+              const contextLabel =
+                context === 'consensus'
+                  ? s.consensus
+                  : `${s.group_123} ${groupLetters[context.groupId] ?? context.groupId}`
 
               return (
                 <button
                   key={`statement-${statement.tid}`}
                   className="vis-control-btn"
+                  type="button"
+                  aria-label={`${s.comment_123} ${statement.tid}, ${contextLabel}`}
                   onClick={() => {
                     // Toggle selection
                     if (isSelected) {
@@ -154,6 +165,7 @@ export function VisualizationControls({
                       onStatementSelect(statement, context)
                     }
                   }}
+                  aria-pressed={isSelected}
                   style={{
                     padding: '0.5rem 1rem',
                     borderRadius: '8px',

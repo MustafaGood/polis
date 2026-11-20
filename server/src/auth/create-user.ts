@@ -53,21 +53,17 @@ async function getOrCreateUserIDFromOidcSub(
 
   // Extract email from either standard claims or custom namespace claims
   const namespace = Config.authNamespace;
-  const email = oidcUser.email || oidcUser[`${namespace}email`];
+  const emailClaim = oidcUser.email || oidcUser[`${namespace}email`];
+  const email =
+    typeof emailClaim === "string" && emailClaim.trim()
+      ? emailClaim.trim()
+      : null;
   const name =
     oidcUser.name || oidcUser[`${namespace}name`] || oidcUser.nickname;
 
-  // Validate required fields upfront
-  if (!email) {
-    throw new Error(
-      `OIDC user missing email. Sub: ${oidcSub}, User: ${JSON.stringify(
-        oidcUser
-      )}`
-    );
-  }
-
-  const displayName = name || oidcUser.nickname || email.split("@")[0];
-  const username = oidcUser.nickname || email.split("@")[0];
+  const emailName = email ? email.split("@")[0] : null;
+  const displayName = name || oidcUser.nickname || emailName || "eID participant";
+  const username = oidcUser.nickname || emailName;
 
   // Use a single transaction to handle the entire user creation/mapping process
   // This prevents race conditions by ensuring atomicity
@@ -197,12 +193,26 @@ async function getOrCreateUserIDFromOidcSub(
                     } else {
                       // No existing mapping for this uid, create new one
                       pg.query(
-                        "INSERT INTO oidc_user_mappings (oidc_sub, uid, created) VALUES ($1, $2, now_as_millis()) ON CONFLICT (oidc_sub) DO NOTHING",
+                        "INSERT INTO oidc_user_mappings (oidc_sub, uid, created) VALUES ($1, $2, now_as_millis()) ON CONFLICT (oidc_sub) DO UPDATE SET oidc_sub = EXCLUDED.oidc_sub RETURNING uid",
                         [oidcSub, uid],
-                        (mappingInsertErr: any) => {
+                        (
+                          mappingInsertErr: any,
+                          mappingInsertResult: { rows: { uid: number }[] }
+                        ) => {
                           if (mappingInsertErr) {
                             return pg.query("ROLLBACK", [], () =>
                               reject(mappingInsertErr)
+                            );
+                          }
+
+                          const mappedUid = mappingInsertResult.rows[0]?.uid;
+                          if (!mappedUid) {
+                            return pg.query("ROLLBACK", [], () =>
+                              reject(
+                                new Error(
+                                  "Failed to create or find OIDC user mapping"
+                                )
+                              )
                             );
                           }
 
@@ -210,9 +220,9 @@ async function getOrCreateUserIDFromOidcSub(
                           pg.query("COMMIT", [], (commitErr: any) => {
                             if (commitErr) return reject(commitErr);
                             logger.info(
-                              `Successfully created/linked user for OIDC sub ${oidcSub}: uid ${uid}`
+                              `Successfully created/linked user for OIDC sub ${oidcSub}: uid ${mappedUid}`
                             );
-                            resolve(uid);
+                            resolve(mappedUid);
                           });
                         }
                       );

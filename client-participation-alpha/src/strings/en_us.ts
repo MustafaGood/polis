@@ -24,7 +24,7 @@ const s: Translations = {
   couldNotLoadConversation:
     "Could not load this conversation. Error: {{error}}. Please check the ID and try again.",
   participantHelpWelcomeText:
-    "Welcome to a new kind of conversation — </b>vote</b> on other people’s statements — </b> the more the better.</b>",
+    "Welcome to a new kind of conversation <b>vote</b> on other people’s statements <b>the more the better</b>.",
   signInToParticipate: "You need to sign in to participate.",
 
   // ─────────────────────────────────────────────────────────────
@@ -59,14 +59,14 @@ const s: Translations = {
     "Statement submitted! Only other participants will see your statement and agree or disagree.",
   helpWriteListIntro: "What makes for a good statement?",
   helpWriteListRaisNew: "A new perspective, experience, or issue",
-  helpWriteListShort: "Clear & concise wording (limited to 140 characters)",
+  helpWriteListShort: "Clear & concise wording (limited to 400 characters)",
   helpWriteListStandalone: "A stand-alone idea",
   submitComment: "Submit",
   tipCommentsRandom:
-    "Statements are displayed randomly and you are not replying directly to other people’s statements: <b> you are adding a stand-alone statement.<b>",
-  writePrompt: "Share your perspective (you are not replying — submit a stand-alone statement)",
+    "Statements are displayed randomly and you are not replying directly to other people’s statements: <b>you are adding a stand-alone statement.</b>",
+  writePrompt: "Share your perspective (you are not replying submit a stand-alone statement)",
   writeCommentHelpText:
-    "Are your perspectives or experiences missing from the conversation? If so, </b>add them </b> in the box below — </b>one at a time</b>.",
+    "Are your perspectives or experiences missing from the conversation? If so, <b>add them</b> in the box below <b>one at a time</b>.",
 
   // ─────────────────────────────────────────────────────────────
   // Visualization
@@ -97,7 +97,7 @@ const s: Translations = {
   // ─────────────────────────────────────────────────────────────
   download_invites_csv: "Download CSV",
   invite_code_accepted_message:
-    "Invite accepted. Your login code is: {{login_code}}. Treat this code like a password — save it in a secure place. You must use it to log in again later. It cannot be re-issued if lost.",
+    "Invite accepted. Your login code is: {{login_code}}. Treat this code like a password save it in a secure place. You must use it to log in again later. It cannot be re-issued if lost.",
   invite_code_accepted_message_no_code: "Invite accepted.",
   invite_code_invalid: "The provided invite code was invalid. Please try again.",
   invite_code_prompt: "Enter Invite Code",
@@ -135,6 +135,17 @@ const s: Translations = {
   // ─────────────────────────────────────────────────────────────
   // Authentication / XID
   // ─────────────────────────────────────────────────────────────
+  oidcSignIn: "Sign in with BankID or Freja (eID PoC)",
+  oidcSignOut: "Sign out",
+  oidcSignedInAs: "Signed in as {{email}}",
+  oidcLoginCanceled:
+    "Sign-in was canceled in BankID/Freja. You can try again when ready.",
+  oidcTryAgain: "Try again",
+  oidcLoginFailed: "Sign-in failed. Please try again.",
+  oidcLoginFrejaUnavailable:
+    "Freja is temporarily unavailable (Idura could not reach Freja). Try BankID, or wait a few minutes and try Freja again.",
+  eidRequired:
+    "This conversation requires BankID or Freja. Sign in with eID to participate.",
   xidOidcConflictWarning:
     "Warning: You are currently signed-in to polis, but have opened a conversation with an XID token. To participate with an XID, please log out of your polis account.",
   xidRequired:

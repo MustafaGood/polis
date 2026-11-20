@@ -144,6 +144,12 @@ Anonymous JWTs are conversation-scoped. A JWT for one conversation cannot be use
 
 Standard users maintain their identity across conversations but receive conversation-specific participant JWTs. The OIDC identity links all their participations.
 
+### Broker eID for Participants
+
+Participant OIDC users are mapped by the verified provider `sub`; an email claim is optional. When an eID-required conversation is enabled, the server accepts only the configured BankID/Freja `acr` values from a JWT verified against the configured issuer, audience, and JWKS. The verified eID `acr` is carried in the signed participant JWT for that conversation. A participant JWT from another conversation does not transfer the eID proof.
+
+The conversation setting `eid_required` defaults to false. It cannot be enabled together with XID requirements or an XID allow list. Real Idura sandbox validation is still required before enabling this in a live environment.
+
 ## Legacy Cookie Support
 
 The system maintains backward compatibility with permanent cookies (`pc`):

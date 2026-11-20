@@ -38,6 +38,7 @@ const sql_conversations: any = sql.define({
     "auth_opt_allow_3rdparty",
     "use_xid_whitelist",
     "xid_required",
+    "eid_required",
     "treevite_enabled",
     "topics_enabled",
   ],
