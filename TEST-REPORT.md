@@ -19,7 +19,7 @@ or to every pull-request branch.
 | Report-client jsx-a11y lint and triage | Partial | A separate lint command found 23 accessibility-rule errors; full visualization remediation is outside the plan. |
 | Admin checkboxes, dialogs and tables | Partial | Accessibility changes exist; verify all relevant names, keyboard flows and table relationships manually. |
 | Manual NVDA/VoiceOver, keyboard and i18n assessment | Missing | Individual entries in the existing manual checklist are marked untested. Historical code/axe summaries are not a manual assessment. |
-| eID sandbox | Partial | The user reported BankID test-user login and a statement submission was observed. Freja, identity assurance claims and the complete automated sandbox flow remain unverified. |
+| eID sandbox | Partial | A local BankID test-user sign-in was reported and a submitted statement was observed. On 2026-11-19, the local Docker Compose development stack was brought up, the conversation loaded, and the participation API returned HTTP 200. This is a local setup, not a shared or published instance. Freja, identity assurance claims and the complete automated sandbox flow remain unverified. |
 | Documentation and handover | Partial | Guides and test status are available; supervisor review, agreed scope, demo and any required GDPR review remain open. |
 
 ### Plan acceptance criteria
@@ -73,6 +73,14 @@ a claim that CI is green.
 - Earlier in this session, 24 server eID-related unit tests, 6 participant
   tests and 4 admin token tests passed. These numbers concern the earlier eID
   changes only and do not demonstrate end-to-end Idura behavior.
+- Local environment check on 2026-11-19: started the development stack with
+  `docker compose -f docker-compose.yml -f docker-compose.dev.yml --profile postgres up -d`.
+  PostgreSQL became ready, `participationInit` returned HTTP 200, and the
+  conversation, voting controls and statement form loaded in the browser.
+  The local Idura callback route was configured through the Nginx proxy and
+  returned the callback page; this does not verify a complete Idura callback
+  exchange, Freja, eID `acr` enforcement or a shared deployment. The Nginx
+  callback change is local and has not been pushed to GitHub.
 
 ## Pull requests
 
