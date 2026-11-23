@@ -1,9 +1,12 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type { PCAData } from '../../api/types'
 import { a11yStrings, expectNoA11yViolations } from '../../test-utils/a11y'
 
+const mockGetConversationToken = jest.fn()
+
 jest.mock('../../lib/auth', () => ({
-  getConversationToken: jest.fn()
+  getConversationToken: (...args: unknown[]) => mockGetConversationToken(...args)
 }))
 jest.mock('concaveman', () => ({
   __esModule: true,
@@ -18,7 +21,7 @@ const data: PCAData = {
     x: [-1, 1],
     y: [1, -1],
     count: [12, 20],
-    members: [[], []]
+    members: [[101], []]
   },
   'group-clusters': [
     { id: 0, center: [-1, 1], members: [10] },
@@ -53,8 +56,47 @@ describe('PCA visualization accessibility', () => {
 
     screen.getByRole('img', {
       name: a11yStrings.opinionGroups,
-      description: `${a11yStrings.group_123} A, 12; ${a11yStrings.group_123} B, 20`
+      description: /PCA 1 ranges from/
     })
+  })
+
+  it('provides a text summary of group coordinate ranges and centers', () => {
+    render(<PCAVisualization data={data} s={a11yStrings} />)
+    const description = screen.getByText(a11yStrings.pcaTextDescription).closest('details')
+    if (!description) throw new Error('Expected PCA text description disclosure')
+
+    expect(
+      within(description).getByText((content) =>
+        content.startsWith('Group: A 12 participants; PCA 1 ranges from')
+      )
+    ).toBeTruthy()
+    expect(
+      within(description).getByText((content) =>
+        content.startsWith('Group: B 20 participants; PCA 1 ranges from')
+      )
+    ).toBeTruthy()
+    const coordinates = within(description)
+      .getByText(a11yStrings.pcaGroupCoordinates.replace('{{group}}', 'Group: A'))
+      .closest('details')
+    if (!coordinates) throw new Error('Expected PCA group coordinates disclosure')
+    expect(
+      within(coordinates).getByText(
+        (content) => content.includes('PCA 1') && content.includes('PCA 2')
+      )
+    ).toBeTruthy()
+  })
+
+  it('describes the participant cluster position when available', () => {
+    mockGetConversationToken.mockReturnValue({ token: 'test-token', pid: 101 })
+    render(<PCAVisualization data={data} conversationId="test-conversation" s={a11yStrings} />)
+    const description = screen.getByText(a11yStrings.pcaTextDescription).closest('details')
+    if (!description) throw new Error('Expected PCA text description disclosure')
+
+    expect(
+      within(description).getByText((content) =>
+        content.startsWith('Your position is represented by a point in Group: A at PCA 1')
+      )
+    ).toBeTruthy()
   })
 
   it('names group and statement controls with their selection context', () => {
@@ -71,6 +113,23 @@ describe('PCA visualization accessibility', () => {
     screen.getByRole('button', {
       name: `${a11yStrings.comment_123} 42, ${a11yStrings.consensus}`
     })
+  })
+
+  it('operates consensus and group controls with the keyboard', async () => {
+    const user = userEvent.setup()
+    render(<PCAVisualization data={data} s={a11yStrings} />)
+
+    await user.tab()
+    const consensus = screen.getByRole('button', { name: a11yStrings.consensus })
+    expect(document.activeElement).toBe(consensus)
+    await user.keyboard('{Enter}')
+    expect(consensus.getAttribute('aria-pressed')).toBe('true')
+
+    await user.tab()
+    const group = screen.getByRole('button', { name: `${a11yStrings.group_123} A` })
+    expect(document.activeElement).toBe(group)
+    await user.keyboard(' ')
+    expect(group.getAttribute('aria-pressed')).toBe('true')
   })
 
   it('provides a text table for the selected statement vote bars, including statement zero', async () => {

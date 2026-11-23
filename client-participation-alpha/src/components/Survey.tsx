@@ -54,6 +54,7 @@ export default function Survey({
   const [isFetchingNext, setIsFetchingNext] = useState<boolean>(false)
   const [isStatementImportant, setIsStatmentImportant] = useState<boolean>(false)
   const [voteError, setVoteError] = useState<string | null>(null)
+  const [voteFeedback, setVoteFeedback] = useState<string>('')
   const [inviteGate, setInviteGate] = useState<boolean>(requiresInviteCode)
   const inviteGateRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -146,6 +147,7 @@ export default function Survey({
   const handleVote = async (voteType: number, tid: number | string) => {
     setIsFetchingNext(true)
     setVoteError(null)
+    setVoteFeedback('')
 
     try {
       const vote: VoteData = { vote: voteType, tid: tid }
@@ -156,6 +158,7 @@ export default function Survey({
       )
 
       setVoteError(null)
+      setVoteFeedback(s.voteSubmitted)
       if (result?.nextComment) {
         setStatement(result.nextComment)
       } else {
@@ -183,6 +186,7 @@ export default function Survey({
       }
 
       setVoteError(errorMessage)
+      setVoteFeedback('')
     } finally {
       setIsFetchingNext(false)
     }
@@ -198,6 +202,7 @@ export default function Survey({
 
   return (
     <div ref={contentRef} tabIndex={-1} data-participation-content>
+      {voteFeedback && <p role="status">{voteFeedback}</p>}
       {statement ? (
         <Statement
           statement={statement}

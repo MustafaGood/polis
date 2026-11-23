@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { fetchNextComment } from '../../api/comments'
+import { submitVote } from '../../api/votes'
 import { acceptInvite, treeviteLogin } from '../../api/treevite'
 import { a11yStrings } from '../../test-utils/a11y'
 import Survey from '../Survey'
@@ -31,6 +32,7 @@ describe('Survey focus after invite login', () => {
   beforeEach(() => {
     jest.mocked(fetchNextComment).mockReset()
     jest.mocked(fetchNextComment).mockReturnValue(new Promise(() => {}))
+    jest.mocked(submitVote).mockReset()
     jest.mocked(treeviteLogin).mockReset()
     jest.mocked(acceptInvite).mockReset()
   })
@@ -151,5 +153,27 @@ describe('Survey focus after invite login', () => {
     })
     expect(screen.getByLabelText(a11yStrings.notificationsEnterEmail)).toBeTruthy()
     expect(document.activeElement).toBe(landing)
+  })
+
+  it('submits a vote with the keyboard and announces success', async () => {
+    jest.mocked(submitVote).mockResolvedValue({
+      nextComment: { tid: 2, txt: 'The next statement' }
+    })
+    const user = userEvent.setup()
+    render(
+      <Survey
+        s={a11yStrings}
+        conversation_id="test-conversation"
+        initialStatement={{ tid: 1, txt: 'A statement' }}
+      />
+    )
+
+    await user.tab()
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: a11yStrings.agree }))
+    await user.keyboard('{Enter}')
+
+    expect((await screen.findByRole('status')).textContent).toBe(a11yStrings.voteSubmitted)
+    expect(screen.getByText('The next statement')).toBeTruthy()
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: a11yStrings.agree }))
   })
 })

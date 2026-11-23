@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { subscribeToNotifications } from '../../api/notifications'
 import { a11yStrings, expectNoA11yViolations } from '../../test-utils/a11y'
 import EmailSubscribeForm from '../EmailSubscribeForm'
@@ -42,15 +43,17 @@ describe('EmailSubscribeForm a11y', () => {
 
   it('announces a failed request without treating the email as invalid and clears it on edit', async () => {
     jest.mocked(subscribeToNotifications).mockRejectedValue(new Error('Network error'))
+    const user = userEvent.setup()
     const { container } = render(
       <EmailSubscribeForm s={a11yStrings} conversation_id="test-conversation" />
     )
 
     const input = screen.getByLabelText(a11yStrings.notificationsEnterEmail) as HTMLInputElement
-    fireEvent.change(input, { target: { value: 'person@example.com' } })
+    await user.type(input, 'person@example.com')
+    await user.tab()
     const button = screen.getByRole('button', { name: a11yStrings.notificationsSubscribeButton })
-    button.focus()
-    fireEvent.click(button)
+    expect(document.activeElement).toBe(button)
+    await user.keyboard('{Enter}')
 
     expect((await screen.findByRole('alert')).textContent).toBe(
       a11yStrings.notificationsSubscribeErrorGeneric

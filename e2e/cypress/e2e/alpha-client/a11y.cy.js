@@ -5,11 +5,6 @@
  * Creates a seeded conversation unless CYPRESS_A11Y_CONVERSATION_ID is set.
  */
 
-import {
-  createTestConversation,
-  addCommentToConversation,
-} from '../../support/conversation-helpers.js'
-
 function logViolations(violations) {
   cy.task(
     'log',
@@ -30,13 +25,59 @@ describe('Alpha Client: Accessibility smoke', function () {
     conversationId = Cypress.env('A11Y_CONVERSATION_ID')
     if (conversationId) return
 
-    createTestConversation({
-      topic: 'Accessibility smoke test',
-      description: 'Seeded conversation for accessibility tests',
-    }).then((id) => {
-      conversationId = id
-      return addCommentToConversation(id, 'A statement for accessibility testing')
+    const authIssuer = Cypress.env('AUTH_ISSUER')
+    const tokenUrl = authIssuer.endsWith('/')
+      ? `${authIssuer}oauth/token`
+      : `${authIssuer}/oauth/token`
+    const email = Cypress.env('A11Y_MODERATOR_EMAIL') || 'moderator@polis.test'
+    const password = Cypress.env('A11Y_MODERATOR_PASSWORD') || 'Te$tP@ssw0rd*'
+    let accessToken
+
+    cy.request({
+      method: 'POST',
+      url: tokenUrl,
+      body: {
+        grant_type: 'password',
+        username: email,
+        password,
+        audience: Cypress.env('AUTH_AUDIENCE'),
+        client_id: Cypress.env('AUTH_CLIENT_ID'),
+        scope: 'openid profile email',
+      },
     })
+      .then(({ body }) => {
+        expect(body).to.have.property('access_token')
+        accessToken = body.access_token
+        return cy.request({
+          method: 'POST',
+          url: '/api/v3/conversations',
+          headers: { Authorization: `Bearer ${accessToken}` },
+          body: {
+            topic: 'Accessibility smoke test',
+            description: 'Seeded conversation for accessibility tests',
+            is_anon: true,
+            is_active: true,
+            vis_type: 0,
+          },
+        })
+      })
+      .then(({ body, status }) => {
+        expect(status).to.eq(200)
+        conversationId = body.conversation_id
+        return cy.request({
+          method: 'POST',
+          url: '/api/v3/comments',
+          headers: { Authorization: `Bearer ${accessToken}` },
+          body: {
+            conversation_id: conversationId,
+            txt: 'A statement for accessibility testing',
+            is_seed: true,
+          },
+        })
+      })
+      .then(({ status }) => {
+        expect(status).to.eq(200)
+      })
   })
 
   beforeEach(function () {
@@ -70,6 +111,19 @@ describe('Alpha Client: Accessibility smoke', function () {
     cy.focused().should('have.attr', 'data-testid', 'vote-pass')
   })
 
+  it('submits a vote with the keyboard and announces success', function () {
+    cy.intercept('POST', '**/api/v3/votes*', {
+      statusCode: 200,
+      body: { nextComment: { tid: 999, txt: 'Next accessible statement' } },
+    }).as('submitVote')
+
+    cy.get('[data-testid="vote-agree"]', { timeout: 15000 }).should('be.enabled').focus()
+    cy.press(Cypress.Keyboard.Keys.SPACE)
+    cy.wait('@submitVote').its('response.statusCode').should('eq', 200)
+    cy.get('[role="status"]').should('contain.text', 'Vote submitted.')
+    cy.get('.statement-text').should('contain.text', 'Next accessible statement')
+  })
+
   it('associates a duplicate submission error with the field', function () {
     cy.intercept('POST', '**/api/v3/comments*', {
       statusCode: 409,
@@ -81,7 +135,9 @@ describe('Alpha Client: Accessibility smoke', function () {
       .closest('astro-island')
       .should('not.have.attr', 'ssr')
     cy.get('#comment-textarea').type('Test statement')
-    cy.get('.submit-form button[type="submit"]').click()
+    cy.press(Cypress.Keyboard.Keys.TAB)
+    cy.focused().should('have.attr', 'type', 'submit').and('be.enabled')
+    cy.press(Cypress.Keyboard.Keys.SPACE)
     cy.wait('@duplicateComment').its('response.statusCode').should('eq', 409)
 
     cy.get('#survey-form-error').should('be.visible').and('have.attr', 'role', 'alert')

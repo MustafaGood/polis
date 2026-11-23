@@ -68,12 +68,76 @@ export default function PCAVisualization({
     selectedStatement?.tid ?? null,
     userPid
   )
-  const visualizationDescription = hulls
-    .map(
-      ({ groupId, participantCount }) =>
-        `${s.group_123} ${groupLetters[groupId] ?? groupId}, ${participantCount}`
+  const formatCoordinate = (value: number) =>
+    new Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(value)
+  const groupSummaries = data['group-clusters'].map((group) => {
+    const label = `${s.group_123} ${groupLetters[group.id] ?? group.id}`
+    const groupData = hulls.find((hull) => hull.groupId === group.id)
+    const points = data['base-clusters'].id.reduce<{ x: number; y: number }[]>(
+      (coordinates, clusterId, index) => {
+        if (group.members.includes(clusterId)) {
+          coordinates.push({
+            x: data['base-clusters'].x[index],
+            y: data['base-clusters'].y[index]
+          })
+        }
+        return coordinates
+      },
+      []
     )
-    .join('; ')
+    const xValues = points.map(({ x }) => x)
+    const yValues = points.map(({ y }) => y)
+    const center = group.center
+    const coordinate = (value: number | undefined) =>
+      value === undefined ? s.pcaCoordinateUnavailable : formatCoordinate(value)
+    return {
+      id: group.id,
+      label,
+      description: s.pcaGroupDescription
+        .replace('{{group}}', label)
+        .replace('{{count}}', String(groupData?.participantCount ?? 0))
+        .replace('{{xMin}}', coordinate(xValues.length ? Math.min(...xValues) : undefined))
+        .replace('{{xMax}}', coordinate(xValues.length ? Math.max(...xValues) : undefined))
+        .replace('{{yMin}}', coordinate(yValues.length ? Math.min(...yValues) : undefined))
+        .replace('{{yMax}}', coordinate(yValues.length ? Math.max(...yValues) : undefined))
+        .replace('{{centerX}}', coordinate(center?.[0]))
+        .replace('{{centerY}}', coordinate(center?.[1])),
+      points
+    }
+  })
+  const groupDescriptions = groupSummaries.map(({ description }) => description)
+  const userCluster =
+    userPid === null
+      ? undefined
+      : data['base-clusters'].id.reduce<{ groupId: number; x: number; y: number } | undefined>(
+          (found, clusterId, index) => {
+            if (found || !data['base-clusters'].members?.[index]?.includes(userPid)) {
+              return found
+            }
+            const group = data['group-clusters'].find((item) => item.members.includes(clusterId))
+            if (!group) return undefined
+            return {
+              groupId: group.id,
+              x: data['base-clusters'].x[index],
+              y: data['base-clusters'].y[index]
+            }
+          },
+          undefined
+        )
+  const userPositionDescription = userCluster
+    ? s.pcaUserPositionDescription
+        .replace(
+          '{{group}}',
+          `${s.group_123} ${groupLetters[userCluster.groupId] ?? userCluster.groupId}`
+        )
+        .replace('{{x}}', formatCoordinate(userCluster.x))
+        .replace('{{y}}', formatCoordinate(userCluster.y))
+    : conversationId
+      ? s.pcaUserPositionUnavailable
+      : null
+  const visualizationDescription = [...groupDescriptions, userPositionDescription]
+    .filter(Boolean)
+    .join(' ')
   const displayedVoteData = groupVoteData.filter(
     (vote) => vote.total > 0 && hulls.some((hull) => hull.groupId === vote.groupId && hull.center)
   )
@@ -172,6 +236,29 @@ export default function PCAVisualization({
       </svg>
 
       {/* Controls */}
+      <details className="pca-text-description">
+        <summary>{s.pcaTextDescription}</summary>
+        <ul>
+          {groupSummaries.map(({ id, label, description, points }) => (
+            <li key={id}>
+              {description}
+              <details>
+                <summary>{s.pcaGroupCoordinates.replace('{{group}}', label)}</summary>
+                <ul>
+                  {points.map(({ x, y }, index) => (
+                    <li key={`${id}-${index}`}>
+                      {s.pcaPointCoordinates
+                        .replace('{{x}}', formatCoordinate(x))
+                        .replace('{{y}}', formatCoordinate(y))}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            </li>
+          ))}
+          {userPositionDescription && <li>{userPositionDescription}</li>}
+        </ul>
+      </details>
       <VisualizationControls
         isConsensusSelected={isConsensusSelected}
         selectedGroup={selectedGroup}

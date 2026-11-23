@@ -169,33 +169,40 @@ describe('Visualization', function () {
           cy.intercept('POST', '/api/v3/votes').as('voteRequest')
 
           // Visit with XID
-          cy.visit(`/${conversationId}?xid=${xid}`)
+          cy.visit(`/${conversationId}?xid=${xid}&lang=en`)
 
           // Wait for page to be ready and first vote button to be stable
           cy.get('body').should('be.visible')
           cy.get('#agreeButton', { timeout: 15000 }).should('be.visible').should('not.be.disabled')
-          cy.get('#agreeButton').click()
-          cy.wait('@voteRequest')
 
-          // Second comment - vary the votes
+          const voteAndWaitForNextStatement = (button) =>
+            cy
+              .get('#comment_shower p[dir="auto"]')
+              .first()
+              .invoke('text')
+              .then((statement) => {
+                cy.get(button, { timeout: 10000 }).should('be.visible').should('not.be.disabled')
+                cy.get(button).click()
+                cy.wait('@voteRequest')
+
+                cy.get('#comment_shower').should(($shower) => {
+                  const nextStatement = $shower.find('p[dir="auto"]').first().text().trim()
+                  expect(nextStatement).not.to.equal(statement.trim())
+                })
+              })
+
           const voteButtons = ['#agreeButton', '#disagreeButton', '#passButton']
           const secondButton = voteButtons[index % 3]
-          cy.get(secondButton, { timeout: 10000 }).should('be.visible').should('not.be.disabled')
-          cy.get(secondButton).click()
-          cy.wait('@voteRequest')
-
-          // Third comment
           const thirdButton = voteButtons[(index + 1) % 3]
-          cy.get(thirdButton, { timeout: 10000 }).should('be.visible').should('not.be.disabled')
-          cy.get(thirdButton).click()
-          cy.wait('@voteRequest')
 
-          // Wait for completion message and ensure it's stable
-          cy.contains("You've voted on all", { timeout: 10000 }).should('be.visible')
-          cy.log(`✅ Participant ${index} completed voting successfully`)
-
-          // Return a Cypress chainable
-          return cy.wrap(index)
+          return voteAndWaitForNextStatement('#agreeButton')
+            .then(() => voteAndWaitForNextStatement(secondButton))
+            .then(() => voteAndWaitForNextStatement(thirdButton))
+            .then(() => {
+              cy.get('#agreeButton').should('not.exist')
+              cy.log(`✅ Participant ${index} completed voting successfully`)
+              return cy.wrap(index)
+            })
         }
 
         // Create all 7 participants sequentially using cy.then() chains

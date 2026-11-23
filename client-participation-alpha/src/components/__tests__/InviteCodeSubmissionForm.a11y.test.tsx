@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { acceptInvite, treeviteLogin } from '../../api/treevite'
 import { a11yStrings, expectNoA11yViolations } from '../../test-utils/a11y'
 import InviteCodeSubmissionForm from '../InviteCodeSubmissionForm'
@@ -56,14 +57,19 @@ describe('InviteCodeSubmissionForm a11y', () => {
     jest.mocked(acceptInvite).mockRejectedValue({
       responseText: 'polis_err_treevite_invalid_or_used_invite'
     })
+    const user = userEvent.setup()
     const { container } = render(
       <InviteCodeSubmissionForm s={a11yStrings} conversation_id="test-conversation" />
     )
 
     const invite = screen.getByLabelText(a11yStrings.invite_code_prompt) as HTMLInputElement
     const login = screen.getByLabelText(a11yStrings.login_code_prompt) as HTMLInputElement
-    fireEvent.change(invite, { target: { value: 'invalid' } })
-    fireEvent.click(screen.getByRole('button', { name: a11yStrings.submit_invite_code }))
+    await user.type(invite, 'invalid')
+    await user.tab()
+    expect(document.activeElement).toBe(
+      screen.getByRole('button', { name: a11yStrings.submit_invite_code })
+    )
+    await user.keyboard('{Enter}')
     expect((await screen.findByRole('alert')).textContent).toBe(a11yStrings.invite_code_invalid)
     expect(invite.getAttribute('aria-invalid')).toBe('true')
     expect(invite.getAttribute('aria-describedby')).toBe('invite-code-error')

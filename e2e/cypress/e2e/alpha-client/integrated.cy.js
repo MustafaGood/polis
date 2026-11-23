@@ -9,12 +9,12 @@
  */
 
 import { faker } from '@faker-js/faker'
-import { loginStandardUser } from '../../support/auth-helpers.js'
+import { loginStandardUserAPI } from '../../support/auth-helpers.js'
 
 describe('Alpha Integrated Conversations (embed.js parity target)', function () {
   before(function () {
     // Login as admin to get site_id (legacy integrate page)
-    loginStandardUser('admin@polis.test', 'Te$tP@ssw0rd*')
+    loginStandardUserAPI('admin@polis.test', 'Te$tP@ssw0rd*')
 
     cy.visit('/integrate')
 

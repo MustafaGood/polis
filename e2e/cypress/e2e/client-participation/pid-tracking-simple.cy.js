@@ -85,14 +85,35 @@ describe('PID Tracking Verification', function () {
     cy.clearLocalStorage()
 
     // Visit conversation
-    cy.visit(`/${conversationId}`)
+    cy.intercept('POST', '/api/v3/votes').as('vote')
+    cy.visit(`/${conversationId}?lang=en`)
 
-    // Vote on both comments
-    cy.get('#agreeButton', { timeout: 10000 }).click()
-    cy.get('#agreeButton', { timeout: 10000 }).click()
+    cy.get('#comment_shower p[dir="auto"]')
+      .first()
+      .should('be.visible')
+      .invoke('text')
+      .then((firstStatement) => {
+        cy.get('#agreeButton', { timeout: 10000 }).click()
+        cy.wait('@vote')
 
-    // Should see "voted on all" message
-    cy.contains("You've voted on all", { timeout: 10000 }).should('be.visible')
+        cy.get('#comment_shower').should(($shower) => {
+          const nextStatement = $shower.find('p[dir="auto"]').first().text().trim()
+          expect(nextStatement).not.to.equal(firstStatement.trim())
+        })
+
+        cy.get('#comment_shower p[dir="auto"]')
+          .first()
+          .invoke('text')
+          .then((secondStatement) => {
+            cy.get('#agreeButton', { timeout: 10000 }).click()
+            cy.wait('@vote')
+
+            cy.get('#comment_shower').should(($shower) => {
+              const nextStatement = $shower.find('p[dir="auto"]').first().text().trim()
+              expect(nextStatement).not.to.equal(secondStatement.trim())
+            })
+          })
+      })
 
     // Vote buttons should be hidden
     cy.get('#agreeButton').should('not.exist')

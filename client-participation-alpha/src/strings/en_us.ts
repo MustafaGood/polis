@@ -36,6 +36,7 @@ const s: Translations = {
   signInToVote: "You need to sign in to vote.",
   voteFailedGeneric:
     "Apologies, your vote failed to send. Please check your connection and try again.",
+  voteSubmitted: "Vote submitted.",
 
   // ─────────────────────────────────────────────────────────────
   // Statements
@@ -75,6 +76,15 @@ const s: Translations = {
   consensus: "Consensus",
   group_123: "Group:",
   opinionGroups: "Opinion Groups",
+  pcaTextDescription: "Text description of the opinion groups",
+  pcaGroupDescription:
+    "{{group}} {{count}} participants; PCA 1 ranges from {{xMin}} to {{xMax}}, PCA 2 ranges from {{yMin}} to {{yMax}}; center at PCA 1 {{centerX}}, PCA 2 {{centerY}}.",
+  pcaGroupCoordinates: "Cluster coordinates for {{group}}",
+  pcaPointCoordinates: "PCA 1 {{x}}, PCA 2 {{y}}",
+  pcaUserPositionDescription:
+    "Your position is represented by a point in {{group}} at PCA 1 {{x}}, PCA 2 {{y}}.",
+  pcaUserPositionUnavailable: "Your position is not available in this visualization.",
+  pcaCoordinateUnavailable: "not available",
   pctAgreedLong: "{{pct}}% of everyone who voted on statement {{comment_id}} agreed.",
   pctAgreedOfGroupLong:
     "{{pct}}% of those in group {{group}} who voted on statement {{comment_id}} agreed.",
@@ -138,14 +148,12 @@ const s: Translations = {
   oidcSignIn: "Sign in with BankID or Freja (eID PoC)",
   oidcSignOut: "Sign out",
   oidcSignedInAs: "Signed in as {{email}}",
-  oidcLoginCanceled:
-    "Sign-in was canceled in BankID/Freja. You can try again when ready.",
+  oidcLoginCanceled: "Sign-in was canceled in BankID/Freja. You can try again when ready.",
   oidcTryAgain: "Try again",
   oidcLoginFailed: "Sign-in failed. Please try again.",
   oidcLoginFrejaUnavailable:
     "Freja is temporarily unavailable (Idura could not reach Freja). Try BankID, or wait a few minutes and try Freja again.",
-  eidRequired:
-    "This conversation requires BankID or Freja. Sign in with eID to participate.",
+  eidRequired: "This conversation requires BankID or Freja. Sign in with eID to participate.",
   xidOidcConflictWarning:
     "Warning: You are currently signed-in to polis, but have opened a conversation with an XID token. To participate with an XID, please log out of your polis account.",
   xidRequired:

@@ -66,6 +66,13 @@ export interface Translations {
   ok_got_it: string
   oops: string
   opinionGroups: string
+  pcaTextDescription: string
+  pcaGroupDescription: string
+  pcaGroupCoordinates: string
+  pcaPointCoordinates: string
+  pcaUserPositionDescription: string
+  pcaUserPositionUnavailable: string
+  pcaCoordinateUnavailable: string
   or_text: string
   participantHelpWelcomeText: string
   pass: string
@@ -87,6 +94,7 @@ export interface Translations {
   topicSelectionsSavedSuccess: string
   TOS: string
   voteFailedGeneric: string
+  voteSubmitted: string
   writeCommentHelpText: string
   writePrompt: string
   x_wrote: string

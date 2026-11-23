@@ -6,6 +6,20 @@
  * 3. XID participants (custom JWT)
  */
 
+function decodeJwtPayload(token, win) {
+  const payload = token.split('.')[1]
+  if (!payload) {
+    throw new Error('Invalid JWT: payload is missing')
+  }
+
+  const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+  const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=')
+  const binary = win.atob(padded)
+  const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0))
+
+  return JSON.parse(new win.TextDecoder().decode(bytes))
+}
+
 /**
  * Helper to authenticate a standard user via OIDC simulator using UI
  * @param {string} email - User email
@@ -39,6 +53,8 @@ export function loginStandardUser(email, password, options = {}) {
     const authIssuer = Cypress.env('AUTH_ISSUER')
     const authOrigin = new URL(authIssuer).origin
     const authHost = new URL(authIssuer).host
+
+    cy.url({ timeout }).should('include', authHost)
 
     cy.origin(
       authOrigin,
@@ -323,7 +339,7 @@ export function verifyJWTClaims(tokenKey, expectedClaims) {
 
       // Decode JWT payload using window.atob from browser context
       return cy.window().then((win) => {
-        const payload = JSON.parse(win.atob(token.split('.')[1]))
+        const payload = decodeJwtPayload(token, win)
         cy.log('🔍 verifyJWTClaims::payload', payload)
 
         const namespace = Cypress.env('AUTH_NAMESPACE')
@@ -350,7 +366,7 @@ export function verifyJWTClaims(tokenKey, expectedClaims) {
       expect(token).to.exist
 
       // Decode JWT payload using window.atob
-      const payload = JSON.parse(win.atob(token.split('.')[1]))
+      const payload = decodeJwtPayload(token, win)
 
       // Verify expected claims
       Object.keys(expectedClaims).forEach((claim) => {
@@ -410,7 +426,7 @@ export function verifyCustomNamespaceClaims(tokenKey, expectedClaims, options = 
 
           // Decode JWT payload using window.atob from browser context
           return cy.window().then((win) => {
-            const payload = JSON.parse(win.atob(token.split('.')[1]))
+            const payload = decodeJwtPayload(token, win)
             const namespace = Cypress.env('AUTH_NAMESPACE')
 
             // Verify custom namespace claims
@@ -433,7 +449,7 @@ export function verifyCustomNamespaceClaims(tokenKey, expectedClaims, options = 
       expect(token).to.exist
 
       // Decode JWT payload using window.atob
-      const payload = JSON.parse(win.atob(token.split('.')[1]))
+      const payload = decodeJwtPayload(token, win)
       const namespace = Cypress.env('AUTH_NAMESPACE')
 
       // Verify custom namespace claims
@@ -495,7 +511,7 @@ export function verifyIDTokenClaims(expectedClaims, options = {}) {
       cy.log('✅ ID token found, verifying claims...')
 
       // Decode JWT payload using window.atob
-      const payload = JSON.parse(win.atob(token.split('.')[1]))
+      const payload = decodeJwtPayload(token, win)
 
       // Verify standard claims
       Object.keys(expectedClaims).forEach((claim) => {
@@ -609,7 +625,7 @@ export function verifyJWTExists(tokenKey = 'participant_token', expectedClaims =
     expect(parts).to.have.length(3)
 
     // Decode and verify payload using window.atob
-    const payload = JSON.parse(win.atob(parts[1]))
+    const payload = decodeJwtPayload(token, win)
 
     // Verify expected claims
     Object.keys(expectedClaims).forEach((claim) => {

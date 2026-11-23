@@ -10,6 +10,12 @@ kördes med simulerade tangenttryck i Chromium mot isolerade komponenter och
 mockade API-svar. Resultat märkta "Delvis" nedan gäller endast den testmiljön,
 inte hela liveflödet eller en skärmläsare.
 
+**Kod- och testuppdatering 2026-11-23:** Vote-success status och textalternativ
+för PCA-grupper, koordinater och deltagarens klusterposition har lagts till.
+Komponenttester täcker vissa tangentbordsflöden. Detta är inte en manuell
+skärmläsarbedömning; checkliststatus nedan ändras inte till Pass utan manuell
+kontroll.
+
 ---
 
 ## Förutsättningar
@@ -101,6 +107,67 @@ Tabellen nedan gäller fortfarande manuella kontroller i det verkliga flödet.
 | 6.2 | Skip/tab-ordning känns logisk top→bottom                | Ej testat |            |
 | 6.3 | `?ui_lang=fr` byter UI-strängar (Agree → franska m.m.)  | Ej testat |            |
 | 6.4 | `?ui_lang=sv` eller Accept-Language påverkar UI rimligt | Ej testat |            |
+
+---
+
+## 7. PCA-visualisering
+
+| #   | Check | Resultat | Anteckning |
+| --- | ----- | -------- | ---------- |
+| 7.1 | Tangentbord kan öppna och stänga textbeskrivningen | Ej testat | Komponenttest täcker tangentbordsaktivering av Consensus- och gruppknappar |
+| 7.2 | Gruppantal, PCA 1/2-intervall, centrum och koordinatlistor motsvarar grafens data | Ej testat | Textalternativ finns i en utfällbar beskrivning; jämför mot grafen manuellt |
+| 7.3 | Egen klusterposition läses begripligt när den finns | Ej testat | Beskrivningen använder klustrets PCA-koordinater, inte en separat exakt individpunkt |
+| 7.4 | Grupp- och påståendekontroller har begripligt namn och aktuellt valt tillstånd | Delvis | Namn/`aria-pressed` testas i Jest; skärmläsare återstår |
+| 7.5 | Röstdatatabellens rubriker och gruppvärden förstås med skärmläsare | Ej testat | Jest kontrollerar tabellsemantik, inte NVDA/VoiceOver |
+
+**Skärmläsare:** kontrollera att disclosure-namnet, gruppbeskrivningarna,
+koordinatlistorna, deltagarpositionen och vald status går att hitta och förstå
+med NVDA/VoiceOver.
+
+---
+
+## 8. Fullständig manuell tangentbordsgranskning av liveflöden
+
+**Status: Ej utförd.** Använd denna sektion för ett separat, dokumenterat
+genomspel på en dedikerad testmiljö. Röstning, kommentarer, prenumeration,
+invite och login kan skapa eller ändra data. Använd inte produktionsdata eller
+en gemensam databas.
+
+### Körningsuppgifter
+
+| Fält | Värde |
+| --- | --- |
+| Datum / testare | Ej ifyllt |
+| Gren / commit | Ej ifyllt |
+| Miljö / testkonversation | Ej ifyllt |
+| Webbläsare / version | Ej ifyllt |
+| Operativsystem | Ej ifyllt |
+| Språk / zoomnivå | Ej ifyllt |
+| Skärmläsare / version (om använd) | Ej ifyllt |
+
+### Resultat för tangentbordsflöden
+
+Markera varje rad Pass / Delvis / Fail / N/A och ange observationer. Kör först
+med tangentbord utan mus. Starta om från en ren konversationssida mellan
+flödena där det behövs.
+
+| Flöde | Manuell kontroll | Kriterier | Resultat / anteckning |
+| --- | --- | --- | --- |
+| Sidnavigation | Ladda konversationen och tabba från sidstart. Kontrollera att fokus är synligt hela tiden, ordningen är begriplig, sidans huvuddel går att nå och inget element fångar fokus. | 2.1.1, 2.1.2, 2.4.3, 2.4.7 | Ej testat |
+| Röstning | Tabba till Agree, Disagree och Pass. Aktivera var och en separat med Enter och Space i testkonversation. Kontrollera fokus efter nästa påstående, slutvy och simulerat fel. | 2.1.1, 2.4.3, 2.4.7, 4.1.2, 4.1.3 | Ej testat |
+| Skicka påstående | Tabba till textarea och Submit. Skicka ett testpåstående med Enter och prova tomt, ogiltigt och duplicerat svar. Kontrollera att text, fel, fokus och statusmeddelande hanteras utan mus. | 1.3.1, 2.1.1, 3.3.1, 3.3.2, 3.3.3, 4.1.3 | Ej testat |
+| E-postformulär | I en konversation utan fler påståenden: tabba till e-postfält och Subscribe. Prova ogiltig adress, API-fel och testad lyckad prenumeration; kontrollera fokus när formuläret ersätts av bekräftelse. | 2.1.1, 2.4.3, 3.3.1, 3.3.2, 4.1.3 | Ej testat |
+| Invite / login-kod | I en testkonversation som kräver invite: tabba genom båda formulären. Skicka giltig och ogiltig testkod med Enter. Kontrollera fältkopplade fel, status och återhämtning efter fel. | 2.1.1, 2.4.3, 3.3.1, 3.3.2, 4.1.3 | Ej testat |
+| Login-modal | Öppna login-kodsmodalen via inviteflödet. Kontrollera startfokus, Tab och Shift+Tab-gränser, Escape, kopieringsknapp samt fokusåtergång även om utlösaren försvinner. | 2.1.1, 2.1.2, 2.4.3, 4.1.2 | Ej testat |
+| PCA | Öppna textbeskrivningen med tangentbord. Gå igenom gruppkontroller, påståendekontroller och tabellen. Aktivera val med Enter/Space och kontrollera `aria-pressed`, status och fokus. Jämför koordinatlistor med grafen. | 1.1.1, 1.3.1, 2.1.1, 2.4.3, 4.1.2, 4.1.3 | Ej testat |
+| OIDC-simulator | Om simulatorn är konfigurerad: kör inloggning och utloggning med tangentbord, inklusive avbruten login och felåterhämtning. Detta verifierar inte BankID/Freja i Idura-sandbox. | 2.1.1, 2.4.3, 3.3.1, 4.1.2, 4.1.3 | Ej testat |
+
+### Avslut och rapportering
+
+- [ ] Alla kontroller som gäller har fått ett resultat och observation.
+- [ ] Fail/Delvis har ett reproducerbart steg, förväntat resultat och faktiskt resultat.
+- [ ] Testdata har skapats endast i den dedikerade testmiljön och har hanterats enligt projektets testdataregler.
+- [ ] Sammanfattningen skiljer mellan tangentbordstest, automatisk axe-körning och eventuell skärmläsartestning.
 
 ---
 

@@ -14,11 +14,11 @@ or to every pull-request branch.
 | --- | --- | --- |
 | Participant labels, focus, status, landmarks and form errors | Partial | Implemented and covered in part by existing component tests; complete keyboard and screen-reader journeys remain to be assessed. |
 | Dialog keyboard behavior | Partial | Participant regression tests cover Tab, Escape, clipboard feedback and focus restoration even when the invite form disappears; verify live participant and admin flows. |
-| PCA alternative and controls | Partial | Group counts, controls and a table of displayed statement vote counts are available; the plot geometry and user position still lack equivalent text, and manual assessment remains. |
-| jest-axe and cypress-axe | Partial | Cypress checks for voting, keyboard focus and the submission form passed with mock APIs; the seeded setup still needs a dedicated real-stack run and CI verification. |
+| PCA alternative and controls | Partial | A text disclosure now gives group counts, PCA coordinate ranges and centers, cluster coordinates, and the participant's cluster position when available. Manual review must confirm the description is understandable and sufficiently equivalent. |
+| jest-axe and cypress-axe | Partial | Component tests cover voting, forms and PCA controls. The seeded accessibility spec and full Cypress suite passed locally on the dedicated test stack; remote GitHub CI remains pending because the changes are uncommitted. |
 | Report-client jsx-a11y lint and triage | Partial | A separate lint command found 23 accessibility-rule errors; full visualization remediation is outside the plan. |
 | Admin checkboxes, dialogs and tables | Partial | Accessibility changes exist; verify all relevant names, keyboard flows and table relationships manually. |
-| Manual NVDA/VoiceOver, keyboard and i18n assessment | Missing | Individual entries in the existing manual checklist are marked untested. Historical code/axe summaries are not a manual assessment. |
+| Manual NVDA/VoiceOver, keyboard and i18n assessment | Missing | A full live-flow keyboard checklist is now documented, but no complete manual run is recorded. Individual screen-reader and i18n checks remain untested. Historical code/axe summaries are not a manual assessment. |
 | eID sandbox | Partial | A local BankID test-user sign-in was reported and a submitted statement was observed. On 2026-11-19, the local Docker Compose development stack was brought up, the conversation loaded, and the participation API returned HTTP 200. This is a local setup, not a shared or published instance. Freja, identity assurance claims and the complete automated sandbox flow remain unverified. |
 | Documentation and handover | Partial | Guides and test status are available; supervisor review, agreed scope, demo and any required GDPR review remain open. |
 
@@ -30,18 +30,40 @@ fields; form errors announced by a screen reader; and a green participant
 `npm run verify`. The verify command passed in an isolated copy after its
 format step rewrote files; the unchanged worktree does not pass the CI-style
 format check. Counting only the command criterion gives **1 of 5 (20%)**;
-the other four are unverified. This is not a percentage of the entire LIA or
-a claim that CI is green.
+the other four are not fully verified, although the Cypress run now covers
+parts of the axe and keyboard criteria. This is not a percentage of the entire
+LIA or a claim that CI is green.
 
 ## Test results
 
-- Cypress accessibility smoke: four tests passed twice in an isolated copy
+- Follow-up on 2026-11-23: the participant client passed `npm test -- --runInBand`
+  (16 suites, 129 tests) and `npm run lint`. The new PCA description, participant
+  position summary, successful-vote status, and keyboard interaction tests are
+  included. `npx tsc --noEmit` still reports diagnostics in existing, untouched
+  files; none point to files changed in this follow-up. These results do not
+  replace screen-reader or manual WCAG assessment.
+- Dedicated Cypress run on 2026-11-23: all five tests in
+  `e2e/cypress/e2e/alpha-client/a11y.cy.js` passed against a uniquely named
+  Compose project with its own PostgreSQL database, OIDC simulator, server,
+  Alpha client and proxy. The seeded conversation and comment were created
+  through the isolated API. The run covered two axe checks (zero critical or
+  serious violations in the checked selectors), keyboard focus/vote/comment
+  submission, and a field-associated duplicate-comment error. This was the
+  accessibility spec only, not the full E2E suite; math and file-server
+  services were not started. Cypress ESLint and Prettier checks passed.
+- Full Cypress E2E run on 2026-11-23: all 35 specs completed on the isolated
+  full test stack using `CI=true` (the workflow's timeout and retry settings).
+  Cypress reported 217 passing, 0 failing and 1 pending test (218 total); the
+  pending case is the existing skipped Alpha integrated-embed parity TODO.
+  Some tests needed a retry before passing, so the suite is green but still
+  shows intermittent timing sensitivity. The local run does not establish a
+  GitHub Actions result.
+- Earlier Cypress accessibility smoke: four tests passed twice in an isolated copy
   of the participant app with mock API responses. They cover axe checks for
   the voting card and form, keyboard focus order and an intercepted duplicate
-  submission error. This did not test the seeded-conversation setup, real
-  server/database integration or CI. The test exposed insufficient button
-  contrast, which was corrected and checked in the passing runs.
-- Latest participant changes: `npm test -- --runInBand` passed (16 suites,
+  submission error. This earlier test exposed insufficient button contrast,
+  which was corrected and checked in the passing runs.
+- Earlier participant changes: `npm test -- --runInBand` passed (16 suites,
   125 tests) and `npm run lint` passed. Jest exercises the invite-to-dialog
   focus handoff, clipboard feedback, dialog description and the PCA vote-count
   table, including statement ID 0. TypeScript still reports 34 diagnostics in
@@ -54,8 +76,10 @@ a claim that CI is green.
   voting controls, the three forms, and focus after code login. No real
   conversation data was submitted. Real end-to-end flows and screen-reader
   announcements still need assessment.
-- E2E smoke spec: the Cypress execution with the seeded setup has not been run
-  on a dedicated real stack.
+- GitHub Actions: `.github/workflows/cypress-tests.yml` now triggers on pushes
+  to `feature/eid-oidc-poc`. The remote branch has not run this updated workflow:
+  the changes are local and uncommitted, so remote CI verification is pending
+  push.
 - Participant: `npm test -- --runInBand` passed (15 suites, 103 tests);
   `npm run lint` passed. `npm run verify` and `npm run build` passed in an
   isolated copy without local environment files, where verify automatically
@@ -133,8 +157,9 @@ left untouched.
 
 ## Known limitations and next steps
 
-1. Run the Cypress suite on a dedicated test database and inspect the CI
-   results for each PR. Do not reset a shared database.
+1. The full Cypress suite passed locally on the dedicated test database. Inspect
+   the GitHub Actions result after these changes are committed/pushed; do not
+   reset a shared database.
 2. Record complete keyboard and NVDA/VoiceOver checks, including participant
    and admin dialogs, screen-reader announcements and PCA alternatives.
 3. Address the participant TypeScript diagnostics and the worktree formatting
