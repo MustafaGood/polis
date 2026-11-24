@@ -37,6 +37,12 @@ full accessibility conformance.
 
 ## Test results
 
+- PCA test portability follow-up: GitHub's Linux participant CI failed three
+  tests because they expected the Swedish locale's Unicode minus sign while
+  Linux formatted the number with a hyphen-minus. The expectations now use
+  the runtime's number format, preserving the application's existing behavior.
+  The focused PCA suite passed all 10 tests locally on Windows and in a Linux
+  container. The corrected commit still needs GitHub CI confirmation.
 - Keyboard follow-up on 2026-11-24: after instructions for the isolated
   participation page, the user reported reaching the visible controls,
   seeing focus and not getting trapped. After instructions for the invite gate,

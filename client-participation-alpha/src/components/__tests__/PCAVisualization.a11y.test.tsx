@@ -53,7 +53,7 @@ const data: PCAData = {
 }
 
 describe('PCA visualization accessibility', () => {
-  const negativeOne = '\u22121'
+  const negativeOne = new Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(-1)
 
   it('describes the displayed groups and their data counts', () => {
     render(<PCAVisualization data={data} s={a11yStrings} />)
