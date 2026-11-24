@@ -148,6 +148,19 @@ describe('Alpha Client: Accessibility smoke', function () {
     cy.get('.statement-text').should('contain.text', 'Next accessible statement')
   })
 
+  it('reports a voting service error without critical or serious axe violations', function () {
+    cy.intercept('POST', '**/api/v3/votes*', { statusCode: 503, body: 'unavailable' }).as(
+      'failedVote',
+    )
+    cy.get('[data-testid="vote-agree"]', { timeout: 15000 }).should('be.enabled').focus()
+    cy.press(Cypress.Keyboard.Keys.SPACE)
+    cy.wait('@failedVote').its('response.statusCode').should('eq', 503)
+    cy.get('.vote-error[role="alert"]').should('be.visible')
+    cy.focused().should('have.attr', 'data-testid', 'vote-agree')
+    cy.injectAxe()
+    cy.checkA11y(null, { includedImpacts: ['critical', 'serious'] }, logViolations)
+  })
+
   it('associates a duplicate submission error with the field', function () {
     cy.intercept('POST', '**/api/v3/comments*', {
       statusCode: 409,
@@ -171,6 +184,51 @@ describe('Alpha Client: Accessibility smoke', function () {
       .and('contain', 'survey-form-error')
     cy.get('#comment-textarea').should('have.value', 'Test statement')
 
+    cy.injectAxe()
+    cy.checkA11y(null, { includedImpacts: ['critical', 'serious'] }, logViolations)
+  })
+
+  it('reports a comment service error without marking the text invalid', function () {
+    cy.intercept('POST', '**/api/v3/comments*', { statusCode: 503, body: 'unavailable' }).as(
+      'failedComment',
+    )
+    cy.get('#comment-textarea').closest('astro-island').should('not.have.attr', 'ssr')
+    cy.get('#comment-textarea').type('Test statement')
+    cy.get('.submit-form button[type="submit"]').focus()
+    cy.press(Cypress.Keyboard.Keys.SPACE)
+    cy.wait('@failedComment').its('response.statusCode').should('eq', 503)
+    cy.get('#survey-form-error[role="alert"]').should('be.visible')
+    cy.get('#comment-textarea')
+      .should('have.value', 'Test statement')
+      .and('have.attr', 'aria-invalid', 'false')
+      .and('have.attr', 'aria-describedby')
+      .and('contain', 'survey-form-error')
+    cy.injectAxe()
+    cy.checkA11y(null, { includedImpacts: ['critical', 'serious'] }, logViolations)
+  })
+
+  it('reports an email service error without critical or serious axe violations', function () {
+    cy.intercept('POST', '**/api/v3/votes*', {
+      statusCode: 200,
+      body: { nextComment: null },
+    }).as('lastVote')
+    cy.intercept('POST', '**/api/v3/convSubscriptions*', {
+      statusCode: 503,
+      body: 'unavailable',
+    }).as('failedSubscription')
+    cy.get('[data-testid="vote-agree"]', { timeout: 15000 }).should('be.enabled').focus()
+    cy.press(Cypress.Keyboard.Keys.SPACE)
+    cy.wait('@lastVote')
+    cy.get('#email-subscribe-input').should('be.visible').type('accessibility@example.test')
+    cy.get('.email-subscribe-form button').should('be.enabled').focus()
+    cy.press(Cypress.Keyboard.Keys.SPACE)
+    cy.wait('@failedSubscription').its('response.statusCode').should('eq', 503)
+    cy.get('#email-subscribe-error[role="alert"]').should('be.visible')
+    cy.get('#email-subscribe-input').should(
+      'have.attr',
+      'aria-describedby',
+      'email-subscribe-error',
+    )
     cy.injectAxe()
     cy.checkA11y(null, { includedImpacts: ['critical', 'serious'] }, logViolations)
   })

@@ -42,7 +42,21 @@ full accessibility conformance.
   Linux formatted the number with a hyphen-minus. The expectations now use
   the runtime's number format, preserving the application's existing behavior.
   The focused PCA suite passed all 10 tests locally on Windows and in a Linux
-  container. The corrected commit still needs GitHub CI confirmation.
+  container. GitHub participant CI subsequently passed on the corrected commit.
+- Further isolated axe follow-up on 2026-11-24: 11 participant Cypress tests
+  passed, including mocked HTTP 503 errors for voting, comment submission and
+  email subscription. No critical or serious axe violations were reported in
+  those tested states; no email subscription was created. A separate axe scan
+  of the live PCA view with Group A and Statement 0 selected found no WCAG
+  2.0/2.1 A/AA violations, but left seven contrast nodes for manual review.
+  Measured selected and unselected group-label colors gave 5.22:1 and 10.31:1
+  respectively; this does not resolve every incomplete contrast check.
+- Simulated comment HTTP 503 screen-reader follow-up: the user reported hearing
+  the error on the prepared page, but the page showed no error at the immediate
+  follow-up. A subsequent assistant-triggered submission produced the expected
+  alert. The user's interaction and actual screen-reader announcement could
+  not be independently confirmed. The user could not complete the PCA
+  screen-reader table check.
 - Keyboard follow-up on 2026-11-24: after instructions for the isolated
   participation page, the user reported reaching the visible controls,
   seeing focus and not getting trapped. After instructions for the invite gate,

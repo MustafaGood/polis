@@ -51,6 +51,19 @@ Efter instruktioner för den separata invitevyn uppgav användaren också att
 båda kodformulären nåddes och skickades med Enter, fokus syntes och det gick
 att navigera vidare efter felen.
 
+**Utökad fel- och PCA-kontroll 2026-11-24:** Den utökade Cypress-sviten med
+11 tester passerade, inklusive simulerade HTTP 503-fel vid röstning, påståenden och
+e-post. Axe hittade inga kritiska eller allvarliga fel i dessa tillstånd;
+ingen e-postprenumeration skapades. En separat skanning av livegrafen med
+grupp A och påstående 0 valda gav inga WCAG 2.0/2.1 A/AA-fynd, men sju
+kontrastpunkter kräver manuell bedömning. Uppmätta gruppetiketter hade
+kontrast 5,22:1 som valda och 10,31:1 som icke valda; övriga punkter återstår.
+Användaren uppgav att ett simulerat serverfel för påståenden lästes upp, men
+inget fel syntes vid direkt efterkontroll. Därefter utlöste assistenten
+serverfelet och såg en alert; användarens interaktion och uppläsningen kunde
+inte bekräftas självständigt. Användaren kunde inte genomföra
+skärmläsarkontrollen av PCA-tabellen.
+
 ---
 
 ## Förutsättningar
