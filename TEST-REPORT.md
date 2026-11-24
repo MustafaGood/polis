@@ -37,6 +37,36 @@ full accessibility conformance.
 
 ## Test results
 
+- PCA contrast follow-up on 2026-11-24: in the previously scanned view with
+  Group A selected, the four SVG group-label texts had computed contrast
+  ratios of 5.22:1 (A and 8) and 10.31:1 (B and 7). The selected Group A
+  button measured 5.22:1. The two remaining axe-incomplete text nodes are
+  the white `p.` in the Polis logos on blue, measuring 3.26:1; text in a logo
+  is exempt from WCAG 1.4.3's minimum contrast requirement. These results
+  apply to the inspected state only, not all visualizations or themes.
+- Further invite/login axe checks on 2026-11-24: the participant and invite
+  Cypress specs passed 20/20 tests in the isolated stack, with no critical or
+  serious axe violations in the scanned states. New whole-page scans cover
+  simulated HTTP 503 errors and successful invite/login transitions. Success
+  responses were mocked without authentication tokens, so they do not verify
+  real sign-in. A preceding run failed during slow page loading/hydration;
+  the passing rerun used longer Cypress timeouts. Manual review of other
+  visualization states and supervisor confirmation of the defined
+  journeys remain open.
+- Further success-state accessibility checks on 2026-11-24: the expanded
+  participant Cypress suite passed 13 tests in the isolated stack. Whole-page
+  axe checks covered simulated successful voting, comment submission and email
+  subscription, as well as the existing error cases; no critical or serious
+  violations were reported in these states. Responses were mocked, so no
+  subscription or statement was created by these tests. An earlier attempt
+  timed out during service readiness; the stack responded before the passing
+  rerun. In the live PCA view, simulated keyboard input toggled Group A and
+  selected Statement 0; Tab focus on the group had a computed solid outline.
+  Screen-reader interpretation and a full manual keyboard review remain open.
+- GitHub E2E run 45314380116 failed before Cypress started: the math image
+  could not download a Clojure dependency because Maven Central returned
+  HTTP 429. A separate E2E run for the same commit passed; neither outcome
+  verifies the subsequent local test additions.
 - PCA test portability follow-up: GitHub's Linux participant CI failed three
   tests because they expected the Swedish locale's Unicode minus sign while
   Linux formatted the number with a hyphen-minus. The expectations now use

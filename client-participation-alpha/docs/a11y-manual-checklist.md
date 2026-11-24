@@ -64,6 +64,32 @@ serverfelet och såg en alert; användarens interaktion och uppläsningen kunde
 inte bekräftas självständigt. Användaren kunde inte genomföra
 skärmläsarkontrollen av PCA-tabellen.
 
+**Uppföljning av framgångsflöden 2026-11-24:** Deltagarsvitens 13
+Cypress-tester passerade i isolerad miljö. Helsides-axe kontrollerade
+simulerad lyckad röstning, påstående och e-postprenumeration utan kritiska
+eller allvarliga fynd. Svaren var mockade; inget påstående eller någon
+prenumeration skapades. Ett första försök stoppades av timeout mot
+testtjänsten; den svarade före den godkända omkörningen. I livegrafen
+växlades grupp A och påstående 0 med simulerad Enter; Tab till gruppknappen
+gav beräknad solid fokusindikator. Manuell tangentbords- och
+skärmläsargranskning återstår.
+
+**Utökad invite/login-axe 2026-11-24:** Deltagar- och invite-sviterna
+passerade 20/20 Cypress-tester i den isolerade miljön. Helsides-axe hittade
+inga kritiska eller allvarliga fel i de skannade tillstånden, inklusive
+simulerade HTTP 503-fel och lyckade övergångar för invite och login.
+Framgångssvaren var mockade utan autentiseringstoken och verifierar inte riktig
+inloggning. En föregående körning fick laddnings- och hydreringstimeouter;
+omkörningen använde längre Cypress-timeouter. Handledarens bekräftelse av
+flödena återstår.
+
+**PCA-kontrast, uppföljning 2026-11-24:** I vyn med grupp A vald mättes
+grafens fyra gruppetiketttexter till 5,22:1 för A och 8 respektive 10,31:1
+för B och 7. Den valda gruppknappen mättes till 5,22:1. De två återstående
+punkterna var logotypernas vita `p.` på blå bakgrund, 3,26:1; logotyptext är
+undantagen från minimikravet i WCAG 1.4.3. Andra graftillstånd och teman är
+inte fullständigt granskade.
+
 ---
 
 ## Förutsättningar

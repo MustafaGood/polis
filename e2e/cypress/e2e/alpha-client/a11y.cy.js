@@ -146,6 +146,8 @@ describe('Alpha Client: Accessibility smoke', function () {
     cy.wait('@submitVote').its('response.statusCode').should('eq', 200)
     cy.get('[role="status"]').should('contain.text', 'Vote submitted.')
     cy.get('.statement-text').should('contain.text', 'Next accessible statement')
+    cy.injectAxe()
+    cy.checkA11y(null, { includedImpacts: ['critical', 'serious'] }, logViolations)
   })
 
   it('reports a voting service error without critical or serious axe violations', function () {
@@ -207,6 +209,19 @@ describe('Alpha Client: Accessibility smoke', function () {
     cy.checkA11y(null, { includedImpacts: ['critical', 'serious'] }, logViolations)
   })
 
+  it('announces a successful comment without critical or serious axe violations', function () {
+    cy.intercept('POST', '**/api/v3/comments*', { statusCode: 200, body: {} }).as('submitComment')
+    cy.get('#comment-textarea').closest('astro-island').should('not.have.attr', 'ssr')
+    cy.get('#comment-textarea').type('Test statement')
+    cy.get('.submit-form button[type="submit"]').focus()
+    cy.press(Cypress.Keyboard.Keys.SPACE)
+    cy.wait('@submitComment').its('response.statusCode').should('eq', 200)
+    cy.get('[role="status"]').contains('Statement submitted!').should('be.visible')
+    cy.get('#comment-textarea').should('have.value', '').and('be.focused')
+    cy.injectAxe()
+    cy.checkA11y(null, { includedImpacts: ['critical', 'serious'] }, logViolations)
+  })
+
   it('reports an email service error without critical or serious axe violations', function () {
     cy.intercept('POST', '**/api/v3/votes*', {
       statusCode: 200,
@@ -229,6 +244,30 @@ describe('Alpha Client: Accessibility smoke', function () {
       'aria-describedby',
       'email-subscribe-error',
     )
+    cy.injectAxe()
+    cy.checkA11y(null, { includedImpacts: ['critical', 'serious'] }, logViolations)
+  })
+
+  it('announces a successful email subscription without critical or serious axe violations', function () {
+    cy.intercept('POST', '**/api/v3/votes*', {
+      statusCode: 200,
+      body: { nextComment: null },
+    }).as('lastVote')
+    cy.intercept('POST', '**/api/v3/convSubscriptions*', {
+      statusCode: 200,
+      body: { status: 'ok' },
+    }).as('subscribe')
+    cy.get('[data-testid="vote-agree"]', { timeout: 15000 }).should('be.enabled').focus()
+    cy.press(Cypress.Keyboard.Keys.SPACE)
+    cy.wait('@lastVote')
+    cy.get('#email-subscribe-input').should('be.visible').type('accessibility@example.test')
+    cy.get('.email-subscribe-form button').should('be.enabled').focus()
+    cy.press(Cypress.Keyboard.Keys.SPACE)
+    cy.wait('@subscribe').its('response.statusCode').should('eq', 200)
+    cy.focused()
+      .should('have.attr', 'role', 'status')
+      .and('contain.text', 'You are subscribed to updates for this conversation.')
+    cy.get('#email-subscribe-input').should('not.exist')
     cy.injectAxe()
     cy.checkA11y(null, { includedImpacts: ['critical', 'serious'] }, logViolations)
   })
