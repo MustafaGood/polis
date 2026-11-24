@@ -77,9 +77,16 @@ const s: Translations = {
   group_123: "Group:",
   opinionGroups: "Opinion Groups",
   pcaTextDescription: "Text description of the opinion groups",
+  pcaAxesDescription:
+    "PCA 1 increases to the right; PCA 2 increases downward. The values describe positions on the graph.",
   pcaGroupDescription:
     "{{group}} {{count}} participants; PCA 1 ranges from {{xMin}} to {{xMax}}, PCA 2 ranges from {{yMin}} to {{yMax}}; center at PCA 1 {{centerX}}, PCA 2 {{centerY}}.",
   pcaGroupCoordinates: "Cluster coordinates for {{group}}",
+  pcaPolygonDescription:
+    "The group is drawn as a filled polygon. Its vertices are listed in drawing order; the last joins the first.",
+  pcaLineDescription: "The group is drawn as a line segment between the listed endpoints.",
+  pcaNoShapeDescription: "No group outline or line segment is drawn.",
+  pcaOutlineCoordinates: "Outline coordinates for {{group}}",
   pcaPointCoordinates: "PCA 1 {{x}}, PCA 2 {{y}}",
   pcaUserPositionDescription:
     "Your position is represented by a point in {{group}} at PCA 1 {{x}}, PCA 2 {{y}}.",

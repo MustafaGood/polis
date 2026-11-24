@@ -1,7 +1,7 @@
 /**
  * Alpha client accessibility smoke (cypress-axe)
  *
- * Checks critical/serious axe violations on the participation voting UI.
+ * Checks critical/serious axe violations on the participation UI and footer.
  * Creates a seeded conversation unless CYPRESS_A11Y_CONVERSATION_ID is set.
  */
 
@@ -87,6 +87,13 @@ describe('Alpha Client: Accessibility smoke', function () {
     cy.wait('@nextComment', { requestTimeout: 30000, responseTimeout: 30000 })
   })
 
+  it('has no critical or serious axe violations on the participation page', function () {
+    cy.get('[data-testid="vote-agree"]', { timeout: 15000 }).should('be.visible')
+    cy.get('#comment-textarea').closest('astro-island').should('not.have.attr', 'ssr')
+    cy.injectAxe()
+    cy.checkA11y(null, { includedImpacts: ['critical', 'serious'] }, logViolations)
+  })
+
   it('has no critical or serious axe violations on the statement voting card', function () {
     cy.get('[data-testid="vote-agree"]', { timeout: 15000 }).should('be.visible')
 
@@ -99,6 +106,23 @@ describe('Alpha Client: Accessibility smoke', function () {
 
     cy.injectAxe()
     cy.checkA11y('.submit-form', { includedImpacts: ['critical', 'serious'] }, logViolations)
+  })
+
+  it('has no critical or serious axe violations on the footer links', function () {
+    cy.get('.footer-links a').should('have.length', 2).and('be.visible')
+
+    cy.injectAxe()
+    cy.checkA11y('.footer-links', { includedImpacts: ['critical', 'serious'] }, logViolations)
+  })
+
+  it('marks fallback English and supported French with their displayed language', function () {
+    cy.visit(`/alpha/${conversationId}?ui_lang=sv`)
+    cy.get('html').should('have.attr', 'lang', 'en')
+    cy.get('[data-testid="vote-agree"]').should('contain.text', 'Agree')
+
+    cy.visit(`/alpha/${conversationId}?ui_lang=fr`)
+    cy.get('html').should('have.attr', 'lang', 'fr')
+    cy.get('[data-testid="vote-agree"]').should('contain.text', 'En accord')
   })
 
   it('moves focus between voting controls with the keyboard', function () {
@@ -148,6 +172,6 @@ describe('Alpha Client: Accessibility smoke', function () {
     cy.get('#comment-textarea').should('have.value', 'Test statement')
 
     cy.injectAxe()
-    cy.checkA11y('.submit-form', { includedImpacts: ['critical', 'serious'] }, logViolations)
+    cy.checkA11y(null, { includedImpacts: ['critical', 'serious'] }, logViolations)
   })
 })

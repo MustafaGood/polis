@@ -3,10 +3,7 @@ import { useCriiptoVerify, AuthMethodSelector, OAuth2Error } from '@criipto/veri
 import '@criipto/verify-react/index.css'
 import type { Translations } from '../strings/types'
 import { IDURA_SE_ACR_VALUES } from '../lib/idura'
-import {
-  getIduraRedirectUri,
-  IDURA_LOGOUT_KEY
-} from '../lib/iduraRedirect'
+import { getIduraRedirectUri, IDURA_LOGOUT_KEY } from '../lib/iduraRedirect'
 
 function stripOidcErrorParamsFromUrl() {
   const url = new URL(window.location.href)
@@ -56,9 +53,7 @@ export function formatIduraError(
       )
       return {
         title: s.oidcLoginFrejaUnavailable,
-        detail: instanceMatch
-          ? `Idura error instance: ${instanceMatch[1]}`
-          : undefined
+        detail: instanceMatch ? `Idura error instance: ${instanceMatch[1]}` : undefined
       }
     }
     const detail = [error.error, error.error_description].filter(Boolean).join(' · ')
@@ -105,7 +100,8 @@ export default function ParticipantIduraLogin({ s }: ParticipantIduraLoginProps)
           onClick={() => {
             window.history.replaceState({}, document.title, window.location.pathname)
             window.location.assign(window.location.pathname)
-          }}>
+          }}
+        >
           {s.oidcTryAgain}
         </button>
       </div>
@@ -126,7 +122,8 @@ export default function ParticipantIduraLogin({ s }: ParticipantIduraLoginProps)
           onClick={() => {
             window.sessionStorage.setItem(IDURA_LOGOUT_KEY, 'true')
             void logout({ redirectUri: getIduraRedirectUri() })
-          }}>
+          }}
+        >
           {s.oidcSignOut}
         </button>
       </div>

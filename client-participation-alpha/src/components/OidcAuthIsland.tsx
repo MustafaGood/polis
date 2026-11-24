@@ -13,10 +13,7 @@ import {
   isIduraIssuer,
   isOidcLoginEnabled
 } from '../lib/idura'
-import {
-  getIduraRedirectUri,
-  IDURA_CALLBACK_PATH
-} from '../lib/iduraRedirect'
+import { getIduraRedirectUri, IDURA_CALLBACK_PATH } from '../lib/iduraRedirect'
 
 interface OidcAuthIslandProps {
   s: Translations
@@ -81,7 +78,8 @@ export default function OidcAuthIsland({ s }: OidcAuthIslandProps) {
         domain={domain}
         clientID={clientId}
         redirectUri={getIduraRedirectUri()}
-        sessionStore={window.sessionStorage}>
+        sessionStore={window.sessionStorage}
+      >
         {window.location.pathname.replace(/\/$/, '') === IDURA_CALLBACK_PATH ? (
           <IduraCallback s={s} />
         ) : (

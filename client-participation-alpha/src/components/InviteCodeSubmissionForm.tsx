@@ -45,7 +45,12 @@ export default function InviteCodeSubmissionForm({
 
       // Store JWT handled centrally in net.ts via handleJwtFromResponse
       // Notify listeners that auth state changed
-      dispatchEvent(new CustomEvent('invite-code-submitted', { bubbles: true }))
+      dispatchEvent(
+        new CustomEvent('invite-code-submitted', {
+          bubbles: true,
+          detail: { hasLoginCode: Boolean(response?.login_code) }
+        })
+      )
 
       if (response && 'login_code' in response && response.login_code) {
         setMessage(
@@ -283,7 +288,7 @@ const invite_code_css = `
   padding: 8px 16px;
   border: 1px solid #666;
   border-radius: 0 4px 4px 0; /* Rounds the right corners */
-  background-color: #777;
+  background-color: #666;
   color: white;
   font-size: 1rem;
   font-weight: 500;
@@ -302,6 +307,7 @@ const invite_code_css = `
 .invite-code-submission-form-container button[aria-disabled='true'] {
   background-color: #ccc;
   border-color: #bbb;
+  color: #333;
   cursor: not-allowed;
 }
 
@@ -325,7 +331,7 @@ const invite_code_css = `
 
 .or-separator {
   text-align: center;
-  color: #777;
+  color: #666;
   margin: 12px 0;
 }
 

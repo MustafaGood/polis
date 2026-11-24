@@ -17,8 +17,8 @@ Full skärmläsar-session (NVDA/VoiceOver) rekommenderas fortfarande som manuell
 
 ## Resultat per område
 
-| Område                | Status              | Evidens                                                                                                                        |
-| --------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Område                | Status           | Evidens                                                                                                                        |
+| --------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | Rösta                 | Pass             | `aria-label` på Agree/Disagree/Pass i DOM; jest-axe Statement; cypress-axe `.statement-card`                                   |
 | Statement-form        | Pass             | `label for="comment-textarea"`; `aria-invalid`; jest-axe SurveyForm; cypress-axe `.submit-form`                                |
 | E-post                | Pass (kod + axe) | Labels + `role="alert"`/`status` i kod; jest-axe EmailSubscribeForm                                                            |
@@ -30,21 +30,21 @@ Full skärmläsar-session (NVDA/VoiceOver) rekommenderas fortfarande som manuell
 
 ## Fynd som åtgärdades denna sprint
 
-* Trasiga boldtaggar i hjälptexter och tips (`en_us` + ar/bs/es_la/hr/my/ps/sw/vi)
-* Ensamma `</i>` i bland annat zh, pt_br, nl, it, da och fy_nl
+- Trasiga boldtaggar i hjälptexter och tips (`en_us` + ar/bs/es_la/hr/my/ps/sw/vi)
+- Ensamma `</i>` i bland annat zh, pt_br, nl, it, da och fy_nl
 
 ## Kvar / rekommendation
 
-* [ ] Ett manuellt stickprov med NVDA eller VoiceOver för röstning och inskick av påstående
-* [ ] Testa modalen i Treevite i webbläsaren när inbjudningsflödet är tillgängligt
-* [ ] API för e-post returnerar 404 i utvecklingsmiljön. Felmeddelandets live region fungerar, men produktfelet ligger utanför tillgänglighetsarbetet.
+- [ ] Ett manuellt stickprov med NVDA eller VoiceOver för röstning och inskick av påstående
+- [ ] Testa modalen i Treevite i webbläsaren när inbjudningsflödet är tillgängligt
+- [ ] API för e-post returnerar 404 i utvecklingsmiljön. Felmeddelandets live region fungerar, men produktfelet ligger utanför tillgänglighetsarbetet.
 
 ## Koppling till tidigare PR:er
 
-| PR         | Innehåll                                                |
-| ---------- | ------------------------------------------------------- |
-| #1         | Labels, live regions, `:focus-visible`, modal, `<main>` |
-| #2         | `aria-describedby` / `aria-invalid`, `aria-pressed`     |
-| #3         | PCA textalternativ                                      |
-| #4         | jest-axe + cypress-axe                                  |
+| PR         | Innehåll                                                          |
+| ---------- | ----------------------------------------------------------------- |
+| #1         | Labels, live regions, `:focus-visible`, modal, `<main>`           |
+| #2         | `aria-describedby` / `aria-invalid`, `aria-pressed`               |
+| #3         | PCA textalternativ                                                |
+| #4         | jest-axe + cypress-axe                                            |
 | #5 (denna) | Korrigering av HTML för i18n samt manuell checklista och resultat |

@@ -1,10 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useCriiptoVerify } from '@criipto/verify-react'
 import { setOidcActions, setOidcTokenGetter } from '../lib/net'
-import {
-  getIduraReturnTo,
-  IDURA_RETURN_TO_KEY
-} from '../lib/iduraRedirect'
+import { getIduraReturnTo, IDURA_RETURN_TO_KEY } from '../lib/iduraRedirect'
 
 /**
  * Wires Idura/Criipto session into PolisNet (parallel to OidcConnector).

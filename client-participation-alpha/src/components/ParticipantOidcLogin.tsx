@@ -14,7 +14,7 @@ function isUserCanceledOidcError(error: Error): boolean {
     msg.includes('user cancelled') ||
     msg.includes('user_canceled') ||
     msg.includes('frejaid_user_canceled') ||
-    msg.includes('bankid') && msg.includes('cancel')
+    (msg.includes('bankid') && msg.includes('cancel'))
   )
 }
 
@@ -38,9 +38,7 @@ function stripOidcErrorParamsFromUrl() {
   }
 }
 
-async function clearOidcErrorAndReload(
-  removeUser: () => Promise<void>
-): Promise<void> {
+async function clearOidcErrorAndReload(removeUser: () => Promise<void>): Promise<void> {
   stripOidcErrorParamsFromUrl()
   try {
     await removeUser()
@@ -82,7 +80,8 @@ export default function ParticipantOidcLogin({ s }: ParticipantOidcLoginProps) {
           className="submit-button"
           onClick={() => {
             void clearOidcErrorAndReload(() => auth.removeUser())
-          }}>
+          }}
+        >
           {s.oidcTryAgain}
         </button>
       </div>
@@ -93,15 +92,14 @@ export default function ParticipantOidcLogin({ s }: ParticipantOidcLoginProps) {
     const label = auth.user?.profile?.email || auth.user?.profile?.sub || 'OIDC'
     return (
       <div className="oidc-login-bar">
-        <span>
-          {s.oidcSignedInAs.replace('{{email}}', String(label))}
-        </span>
+        <span>{s.oidcSignedInAs.replace('{{email}}', String(label))}</span>
         <button
           type="button"
           className="submit-button"
           onClick={() => {
             void auth.removeUser()
-          }}>
+          }}
+        >
           {s.oidcSignOut}
         </button>
       </div>
@@ -118,7 +116,8 @@ export default function ParticipantOidcLogin({ s }: ParticipantOidcLoginProps) {
           void auth.signinRedirect({
             state: { returnTo: window.location.pathname }
           })
-        }>
+        }
+      >
         {s.oidcSignIn}
       </button>
     </div>

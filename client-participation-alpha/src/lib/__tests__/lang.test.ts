@@ -1,6 +1,21 @@
 import { uiLanguageSSR, uiLanguageUniversal } from '../lang'
+import { getDocumentLanguage } from '../../strings/strings'
 
 describe('lang utilities', () => {
+  describe('getDocumentLanguage', () => {
+    it('uses English when the requested translation is unavailable', () => {
+      expect(getDocumentLanguage(uiLanguageSSR('sv', 'fr'))).toBe('en')
+      expect(getDocumentLanguage(uiLanguageSSR(null, 'sv-SE,fr;q=0.9'))).toBe('en')
+      expect(getDocumentLanguage(null)).toBe('en')
+    })
+
+    it('preserves supported language tags', () => {
+      expect(getDocumentLanguage('fr-FR')).toBe('fr-FR')
+      expect(getDocumentLanguage('zh-CN')).toBe('zh-CN')
+      expect(getDocumentLanguage('en-US')).toBe('en-US')
+    })
+  })
+
   describe('uiLanguageSSR', () => {
     it('should return query parameter when provided', () => {
       const result = uiLanguageSSR('fr', 'en-US,en;q=0.9')

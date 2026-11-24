@@ -90,6 +90,12 @@ export default function PCAVisualization({
     const center = group.center
     const coordinate = (value: number | undefined) =>
       value === undefined ? s.pcaCoordinateUnavailable : formatCoordinate(value)
+    const shape = groupData?.hull
+      ? s.pcaPolygonDescription
+      : groupData?.points.length === 2
+        ? s.pcaLineDescription
+        : s.pcaNoShapeDescription
+    const outlineCoordinates = groupData?.outlineCoordinates ?? []
     return {
       id: group.id,
       label,
@@ -102,10 +108,19 @@ export default function PCAVisualization({
         .replace('{{yMax}}', coordinate(yValues.length ? Math.max(...yValues) : undefined))
         .replace('{{centerX}}', coordinate(center?.[0]))
         .replace('{{centerY}}', coordinate(center?.[1])),
-      points
+      points,
+      shape,
+      outlineCoordinates
     }
   })
-  const groupDescriptions = groupSummaries.map(({ description }) => description)
+  const groupDescriptions = groupSummaries.map(({ description, shape, outlineCoordinates }) => {
+    const coordinates = outlineCoordinates.map(([x, y]) =>
+      s.pcaPointCoordinates
+        .replace('{{x}}', formatCoordinate(x))
+        .replace('{{y}}', formatCoordinate(y))
+    )
+    return [description, shape, ...coordinates].join(' ')
+  })
   const userCluster =
     userPid === null
       ? undefined
@@ -135,7 +150,11 @@ export default function PCAVisualization({
     : conversationId
       ? s.pcaUserPositionUnavailable
       : null
-  const visualizationDescription = [...groupDescriptions, userPositionDescription]
+  const visualizationDescription = [
+    s.pcaAxesDescription,
+    ...groupDescriptions,
+    userPositionDescription
+  ]
     .filter(Boolean)
     .join(' ')
   const displayedVoteData = groupVoteData.filter(
@@ -238,10 +257,26 @@ export default function PCAVisualization({
       {/* Controls */}
       <details className="pca-text-description">
         <summary>{s.pcaTextDescription}</summary>
+        <p>{s.pcaAxesDescription}</p>
         <ul>
-          {groupSummaries.map(({ id, label, description, points }) => (
+          {groupSummaries.map(({ id, label, description, points, shape, outlineCoordinates }) => (
             <li key={id}>
               {description}
+              <p>{shape}</p>
+              {outlineCoordinates.length > 0 && (
+                <details>
+                  <summary>{s.pcaOutlineCoordinates.replace('{{group}}', label)}</summary>
+                  <ol>
+                    {outlineCoordinates.map(([x, y], index) => (
+                      <li key={`${id}-outline-${index}`}>
+                        {s.pcaPointCoordinates
+                          .replace('{{x}}', formatCoordinate(x))
+                          .replace('{{y}}', formatCoordinate(y))}
+                      </li>
+                    ))}
+                  </ol>
+                </details>
+              )}
               <details>
                 <summary>{s.pcaGroupCoordinates.replace('{{group}}', label)}</summary>
                 <ul>

@@ -1,8 +1,4 @@
-import {
-  getIduraRedirectUri,
-  getIduraReturnTo,
-  resolveIduraReturnTo
-} from '../iduraRedirect'
+import { getIduraRedirectUri, getIduraReturnTo, resolveIduraReturnTo } from '../iduraRedirect'
 
 describe('getIduraRedirectUri', () => {
   it('uses the fixed callback regardless of the current conversation route', () => {
@@ -24,14 +20,7 @@ describe('Idura return URL', () => {
   })
 
   it('rejects external URLs and the callback itself', () => {
-    expect(resolveIduraReturnTo('https://example.com/steal', 'http://localhost:4321')).toBe(
-      '/'
-    )
-    expect(
-      resolveIduraReturnTo(
-        '/auth/idura/callback/',
-        'http://localhost:4321'
-      )
-    ).toBe('/')
+    expect(resolveIduraReturnTo('https://example.com/steal', 'http://localhost:4321')).toBe('/')
+    expect(resolveIduraReturnTo('/auth/idura/callback/', 'http://localhost:4321')).toBe('/')
   })
 })

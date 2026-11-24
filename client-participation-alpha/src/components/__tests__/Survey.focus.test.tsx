@@ -6,6 +6,7 @@ import { acceptInvite, treeviteLogin } from '../../api/treevite'
 import { a11yStrings } from '../../test-utils/a11y'
 import Survey from '../Survey'
 import TreeviteLoginCodeModal from '../TreeviteLoginCodeModal'
+import type { VoteResponse } from '../types'
 
 jest.mock('../../api/comments', () => ({
   fetchNextComment: jest.fn()
@@ -69,6 +70,7 @@ describe('Survey focus after invite login', () => {
 
     const dialog = await screen.findByRole('dialog')
     expect(dialog.contains(document.activeElement)).toBe(true)
+    expect(screen.getByRole('status', { hidden: true }).textContent).toBe('')
     const agree = screen.getByRole('button', { name: a11yStrings.agree, hidden: true })
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(screen.queryByRole('dialog')).toBeNull()
@@ -77,6 +79,26 @@ describe('Survey focus after invite login', () => {
     expect(document.activeElement?.contains(agree)).toBe(true)
     await user.tab()
     expect(document.activeElement).toBe(agree)
+  })
+
+  it('announces an accepted invite without a login code after the form disappears', async () => {
+    jest.mocked(acceptInvite).mockResolvedValue({ status: 'ok' })
+    render(
+      <Survey
+        s={a11yStrings}
+        conversation_id="test-conversation"
+        requiresInviteCode
+        initialStatement={{ tid: 1, txt: 'A statement' }}
+      />
+    )
+    fireEvent.change(screen.getByLabelText(a11yStrings.invite_code_prompt), {
+      target: { value: 'invite-code' }
+    })
+    fireEvent.click(screen.getByRole('button', { name: a11yStrings.submit_invite_code }))
+    await screen.findByRole('button', { name: a11yStrings.agree })
+    expect(screen.getByRole('status').textContent).toBe(
+      a11yStrings.invite_code_accepted_message_no_code
+    )
   })
 
   it('moves focus into participation when the focused login form disappears', async () => {
@@ -99,6 +121,7 @@ describe('Survey focus after invite login', () => {
     fireEvent.click(submit)
 
     const agree = await screen.findByRole('button', { name: a11yStrings.agree })
+    expect((await screen.findByRole('status')).textContent).toBe(a11yStrings.login_success)
     expect(document.activeElement?.contains(agree)).toBe(true)
     await user.tab()
     expect(document.activeElement).toBe(agree)
@@ -175,5 +198,108 @@ describe('Survey focus after invite login', () => {
     expect((await screen.findByRole('status')).textContent).toBe(a11yStrings.voteSubmitted)
     expect(screen.getByText('The next statement')).toBeTruthy()
     expect(document.activeElement).toBe(screen.getByRole('button', { name: a11yStrings.agree }))
+  })
+
+  it('restores focus to the vote button after it is disabled during a successful vote', async () => {
+    let resolveVote: ((value: VoteResponse) => void) | undefined
+    jest.mocked(submitVote).mockReturnValue(
+      new Promise((resolve) => {
+        resolveVote = resolve
+      })
+    )
+    const user = userEvent.setup()
+    render(
+      <Survey
+        s={a11yStrings}
+        conversation_id="test-conversation"
+        initialStatement={{ tid: 1, txt: 'A statement' }}
+      />
+    )
+    const pass = screen.getByRole('button', { name: a11yStrings.pass })
+    pass.focus()
+    await user.keyboard('{Enter}')
+    expect(pass.hasAttribute('disabled')).toBe(true)
+    pass.blur()
+    if (!resolveVote) throw new Error('Expected the vote request')
+    await act(async () => resolveVote?.({ nextComment: { tid: 2, txt: 'Next statement' } }))
+    expect(screen.getByText('Next statement')).toBeTruthy()
+    expect(document.activeElement).toBe(pass)
+  })
+
+  it('moves focus to the email field when the last statement is voted on', async () => {
+    let resolveVote: ((value: VoteResponse) => void) | undefined
+    jest.mocked(submitVote).mockReturnValue(
+      new Promise((resolve) => {
+        resolveVote = resolve
+      })
+    )
+    const user = userEvent.setup()
+    render(
+      <Survey
+        s={a11yStrings}
+        conversation_id="test-conversation"
+        initialStatement={{ tid: 1, txt: 'A statement' }}
+      />
+    )
+    const agree = screen.getByRole('button', { name: a11yStrings.agree })
+    agree.focus()
+    await user.keyboard('{Enter}')
+    agree.blur()
+    if (!resolveVote) throw new Error('Expected the vote request')
+    await act(async () => resolveVote?.({}))
+    expect(document.activeElement).toBe(screen.getByLabelText(a11yStrings.notificationsEnterEmail))
+  })
+
+  it('restores focus to the vote button if the vote fails', async () => {
+    let rejectVote: ((reason: Error) => void) | undefined
+    jest.mocked(submitVote).mockReturnValue(
+      new Promise((_resolve, reject) => {
+        rejectVote = reject
+      })
+    )
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+    const user = userEvent.setup()
+    render(
+      <Survey
+        s={a11yStrings}
+        conversation_id="test-conversation"
+        initialStatement={{ tid: 1, txt: 'A statement' }}
+      />
+    )
+    const disagree = screen.getByRole('button', { name: a11yStrings.disagree })
+    disagree.focus()
+    await user.keyboard('{Enter}')
+    disagree.blur()
+    if (!rejectVote) throw new Error('Expected the vote request')
+    await act(async () => rejectVote?.(new Error('Network error')))
+    expect(screen.getByRole('alert').textContent).toBe(a11yStrings.voteFailedGeneric)
+    expect(document.activeElement).toBe(disagree)
+  })
+
+  it('does not steal focus if the user moves elsewhere during a vote', async () => {
+    let resolveVote: ((value: VoteResponse) => void) | undefined
+    jest.mocked(submitVote).mockReturnValue(
+      new Promise((resolve) => {
+        resolveVote = resolve
+      })
+    )
+    const user = userEvent.setup()
+    render(
+      <>
+        <button type="button">Outside</button>
+        <Survey
+          s={a11yStrings}
+          conversation_id="test-conversation"
+          initialStatement={{ tid: 1, txt: 'A statement' }}
+        />
+      </>
+    )
+    screen.getByRole('button', { name: a11yStrings.agree }).focus()
+    await user.keyboard('{Enter}')
+    const outside = screen.getByRole('button', { name: 'Outside' })
+    outside.focus()
+    if (!resolveVote) throw new Error('Expected the vote request')
+    await act(async () => resolveVote?.({ nextComment: { tid: 2, txt: 'Next statement' } }))
+    expect(document.activeElement).toBe(outside)
   })
 })

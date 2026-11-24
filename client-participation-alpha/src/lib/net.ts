@@ -247,12 +247,16 @@ async function polisFetch<T = unknown>(
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
   let response: Response
   try {
-    response = await fetchWithEidFallback(url, {
-      method: method,
-      headers: headers,
-      body: body,
-      signal: controller.signal
-    }, usingParticipantJwt ? getAccessTokenSilentlySPA : undefined)
+    response = await fetchWithEidFallback(
+      url,
+      {
+        method: method,
+        headers: headers,
+        body: body,
+        signal: controller.signal
+      },
+      usingParticipantJwt ? getAccessTokenSilentlySPA : undefined
+    )
   } catch (err: unknown) {
     const error = err as Error & { status?: number }
     if (error && error.name === 'AbortError') {

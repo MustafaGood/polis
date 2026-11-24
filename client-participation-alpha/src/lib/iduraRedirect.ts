@@ -12,9 +12,7 @@ export function getIduraRedirectUri(origin = window.location.origin): string {
   return `${origin}${IDURA_CALLBACK_PATH}`
 }
 
-export function getIduraReturnTo(
-  location: ReturnLocation = window.location
-): string {
+export function getIduraReturnTo(location: ReturnLocation = window.location): string {
   if (isCallbackPath(location.pathname)) {
     return '/'
   }

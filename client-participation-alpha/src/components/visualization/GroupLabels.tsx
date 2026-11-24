@@ -111,8 +111,8 @@ export function GroupLabels({ hulls, selectedGroup, userPosition }: GroupLabelsP
                 height={labelHeight}
                 rx={cornerRadius}
                 ry={cornerRadius}
-                fill={isSelected ? '#03a9f4' : 'var(--color-surface)'}
-                stroke={isSelected ? '#03a9f4' : 'var(--color-border)'}
+                fill={isSelected ? 'var(--color-button-bg)' : 'var(--color-surface)'}
+                stroke={isSelected ? 'var(--color-button-bg)' : 'var(--color-border)'}
                 strokeWidth={1}
               />
               <text x={letterX} y={iconSize / 2 - 4} textAnchor="end" {...textStyle}>

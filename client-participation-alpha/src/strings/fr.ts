@@ -21,6 +21,7 @@ s.participantHelpWelcomeText =
 s.agree = "En accord"
 s.disagree = "En désaccord"
 s.pass = "Neutre / Incertain"
+s.voteSubmitted = "Vote enregistré."
 
 // ─────────────────────────────────────────────────────────────
 // Statements
@@ -57,6 +58,23 @@ s.writeCommentHelpText =
 s.comment_123 = "Affirmation :"
 s.group_123 = "Groupe :"
 s.opinionGroups = "Groupes d’opinion"
+s.pcaTextDescription = "Description textuelle des groupes d’opinion"
+s.pcaAxesDescription =
+  "PCA 1 augmente vers la droite ; PCA 2 augmente vers le bas. Les valeurs décrivent les positions sur le graphique."
+s.pcaGroupDescription =
+  "{{group}} {{count}} participants ; PCA 1 va de {{xMin}} à {{xMax}}, PCA 2 va de {{yMin}} à {{yMax}} ; centre à PCA 1 {{centerX}}, PCA 2 {{centerY}}."
+s.pcaGroupCoordinates = "Coordonnées des clusters pour {{group}}"
+s.pcaPointCoordinates = "PCA 1 {{x}}, PCA 2 {{y}}"
+s.pcaPolygonDescription =
+  "Le groupe est représenté par un polygone rempli. Ses sommets sont indiqués dans l’ordre du tracé ; le dernier rejoint le premier."
+s.pcaLineDescription =
+  "Le groupe est représenté par un segment de droite entre les extrémités indiquées."
+s.pcaNoShapeDescription = "Aucun contour de groupe ni segment de droite n’est tracé."
+s.pcaOutlineCoordinates = "Coordonnées du contour pour {{group}}"
+s.pcaUserPositionDescription =
+  "Votre position est représentée par un point dans {{group}} à PCA 1 {{x}}, PCA 2 {{y}}."
+s.pcaUserPositionUnavailable = "Votre position n’est pas disponible dans cette visualisation."
+s.pcaCoordinateUnavailable = "non disponible"
 s.pctAgreedLong =
   "{{pct}} % des personnes qui ont voté au sujet de l’énoncé {{comment_id}} étaient en accord avec celui-ci."
 s.pctAgreedOfGroupLong =

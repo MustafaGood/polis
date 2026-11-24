@@ -67,8 +67,13 @@ export interface Translations {
   oops: string
   opinionGroups: string
   pcaTextDescription: string
+  pcaAxesDescription: string
   pcaGroupDescription: string
   pcaGroupCoordinates: string
+  pcaPolygonDescription: string
+  pcaLineDescription: string
+  pcaNoShapeDescription: string
+  pcaOutlineCoordinates: string
   pcaPointCoordinates: string
   pcaUserPositionDescription: string
   pcaUserPositionUnavailable: string
