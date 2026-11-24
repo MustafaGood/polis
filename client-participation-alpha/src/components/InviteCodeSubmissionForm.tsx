@@ -1,10 +1,16 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { acceptInvite, treeviteLogin } from '../api/treevite'
 import type { Translations } from '../strings/types'
 
 interface InviteCodeSubmissionFormProps {
   s: Translations
   conversation_id: string
+}
+
+function hasApiError(error: unknown, codes: string[]): boolean {
+  if (typeof error !== 'object' || error === null || !('responseText' in error)) return false
+  const { responseText } = error
+  return typeof responseText === 'string' && codes.some((code) => responseText.includes(code))
 }
 
 export default function InviteCodeSubmissionForm({
@@ -15,13 +21,22 @@ export default function InviteCodeSubmissionForm({
   const [loginCode, setLoginCode] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [error, setError] = useState<string>('')
+  const [errorSource, setErrorSource] = useState<'invite' | 'login' | null>(null)
+  const [invalidCode, setInvalidCode] = useState<boolean>(false)
   const [submittingInvite, setSubmittingInvite] = useState<boolean>(false)
   const [submittingLogin, setSubmittingLogin] = useState<boolean>(false)
+  const inviteInputRef = useRef<HTMLInputElement>(null)
+  const inviteSubmitRef = useRef<HTMLButtonElement>(null)
+  const loginInputRef = useRef<HTMLInputElement>(null)
+  const loginSubmitRef = useRef<HTMLButtonElement>(null)
 
   const handleAcceptInvite = async () => {
-    if (!inviteCode) return
+    if (!inviteCode.trim() || submittingInvite || submittingLogin) return
     setSubmittingInvite(true)
+    setMessage('')
     setError('')
+    setErrorSource(null)
+    setInvalidCode(false)
     try {
       const response = await acceptInvite({
         conversation_id,
@@ -30,7 +45,12 @@ export default function InviteCodeSubmissionForm({
 
       // Store JWT handled centrally in net.ts via handleJwtFromResponse
       // Notify listeners that auth state changed
-      dispatchEvent(new CustomEvent('invite-code-submitted', { bubbles: true }))
+      dispatchEvent(
+        new CustomEvent('invite-code-submitted', {
+          bubbles: true,
+          detail: { hasLoginCode: Boolean(response?.login_code) }
+        })
+      )
 
       if (response && 'login_code' in response && response.login_code) {
         setMessage(
@@ -46,18 +66,29 @@ export default function InviteCodeSubmissionForm({
       } else {
         setMessage(s.invite_code_accepted_message_no_code)
       }
+      if (document.activeElement === inviteSubmitRef.current) inviteInputRef.current?.focus()
       setInviteCode('')
-    } catch {
-      setError(s.invite_code_invalid)
+    } catch (err) {
+      console.error('Invite submission failed:', err)
+      const invalid = hasApiError(err, [
+        'polis_err_treevite_invalid_or_used_invite',
+        'polis_err_treevite_invite_race_condition'
+      ])
+      setError(invalid ? s.invite_code_invalid : `${s.error}. ${s.oidcTryAgain}`)
+      setErrorSource('invite')
+      setInvalidCode(invalid)
     } finally {
       setSubmittingInvite(false)
     }
   }
 
   const handleLoginWithCode = async () => {
-    if (!loginCode) return
+    if (!loginCode.trim() || submittingInvite || submittingLogin) return
     setSubmittingLogin(true)
+    setMessage('')
     setError('')
+    setErrorSource(null)
+    setInvalidCode(false)
     try {
       await treeviteLogin({
         conversation_id,
@@ -66,9 +97,14 @@ export default function InviteCodeSubmissionForm({
       // JWT handled in net.ts
       dispatchEvent(new CustomEvent('login-code-submitted', { bubbles: true }))
       setMessage(s.login_success)
+      if (document.activeElement === loginSubmitRef.current) loginInputRef.current?.focus()
       setLoginCode('')
-    } catch {
-      setError(s.login_code_invalid)
+    } catch (err) {
+      console.error('Login code submission failed:', err)
+      const invalid = hasApiError(err, ['polis_err_treevite_login_code_invalid'])
+      setError(invalid ? s.login_code_invalid : `${s.error}. ${s.oidcTryAgain}`)
+      setErrorSource('login')
+      setInvalidCode(invalid)
     } finally {
       setSubmittingLogin(false)
     }
@@ -87,48 +123,100 @@ export default function InviteCodeSubmissionForm({
           </div>
         ) : null}
         {error ? (
-          <div className="notice error" role="alert">
+          <div id="invite-code-error" className="notice error" role="alert">
             {error}
           </div>
         ) : null}
 
-        <div className="invite-code-submission-form-container">
-          <input
-            type="text"
-            dir="ltr"
-            inputMode="text"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            autoComplete="one-time-code"
-            value={inviteCode}
-            onChange={(e) => setInviteCode(e.target.value)}
-            placeholder={s.invite_code_prompt}
-          />
-          <button disabled={!inviteCode || submittingInvite} onClick={handleAcceptInvite}>
-            {submittingInvite ? s.submitting : s.submit_invite_code}
-          </button>
-        </div>
+        <form
+          className="invite-code-field"
+          onSubmit={(e) => {
+            e.preventDefault()
+            void handleAcceptInvite()
+          }}
+        >
+          <label htmlFor="invite-code-input">{s.invite_code_prompt}</label>
+          <div className="invite-code-submission-form-container">
+            <input
+              id="invite-code-input"
+              ref={inviteInputRef}
+              type="text"
+              dir="ltr"
+              inputMode="text"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              autoComplete="one-time-code"
+              value={inviteCode}
+              onChange={(e) => {
+                setInviteCode(e.target.value)
+                if (errorSource === 'invite') {
+                  setError('')
+                  setErrorSource(null)
+                  setInvalidCode(false)
+                }
+              }}
+              required
+              readOnly={submittingInvite}
+              aria-invalid={errorSource === 'invite' && invalidCode}
+              aria-describedby={errorSource === 'invite' ? 'invite-code-error' : undefined}
+            />
+            <button
+              ref={inviteSubmitRef}
+              type="submit"
+              disabled={!inviteCode.trim()}
+              aria-disabled={submittingInvite || submittingLogin || undefined}
+            >
+              {submittingInvite ? s.submitting : s.submit_invite_code}
+            </button>
+          </div>
+        </form>
 
         <div className="or-separator">{s.or_text}</div>
 
-        <div className="invite-code-submission-form-container">
-          <input
-            type="text"
-            dir="ltr"
-            inputMode="text"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            autoComplete="one-time-code"
-            value={loginCode}
-            onChange={(e) => setLoginCode(e.target.value)}
-            placeholder={s.login_code_prompt}
-          />
-          <button disabled={!loginCode || submittingLogin} onClick={handleLoginWithCode}>
-            {submittingLogin ? s.submitting : s.submit_login_code}
-          </button>
-        </div>
+        <form
+          className="invite-code-field"
+          onSubmit={(e) => {
+            e.preventDefault()
+            void handleLoginWithCode()
+          }}
+        >
+          <label htmlFor="login-code-input">{s.login_code_prompt}</label>
+          <div className="invite-code-submission-form-container">
+            <input
+              id="login-code-input"
+              ref={loginInputRef}
+              type="text"
+              dir="ltr"
+              inputMode="text"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              autoComplete="one-time-code"
+              value={loginCode}
+              onChange={(e) => {
+                setLoginCode(e.target.value)
+                if (errorSource === 'login') {
+                  setError('')
+                  setErrorSource(null)
+                  setInvalidCode(false)
+                }
+              }}
+              required
+              readOnly={submittingLogin}
+              aria-invalid={errorSource === 'login' && invalidCode}
+              aria-describedby={errorSource === 'login' ? 'invite-code-error' : undefined}
+            />
+            <button
+              ref={loginSubmitRef}
+              type="submit"
+              disabled={!loginCode.trim()}
+              aria-disabled={submittingInvite || submittingLogin || undefined}
+            >
+              {submittingLogin ? s.submitting : s.submit_login_code}
+            </button>
+          </div>
+        </form>
       </div>
     </>
   )
@@ -157,6 +245,19 @@ const invite_code_css = `
   margin-bottom: 16px;
 }
 
+/* Field group: visible label + input/button row */
+.invite-code-field {
+  margin-bottom: 0;
+}
+
+.invite-code-field label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 6px;
+}
+
 /* Flex container for the input and button */
 .invite-code-submission-form-container {
   display: flex;
@@ -174,13 +275,12 @@ const invite_code_css = `
   border-right: none; /* Removes the border between the input and button */
   border-radius: 4px 0 0 4px; /* Rounds the left corners */
   font-size: 1rem;
-  outline: none; /* Removes the default browser outline on focus */
 }
 
-/* Adds a blue glow on focus for better accessibility */
-.invite-code-submission-form-container input[type="text"]:focus {
+/* Visible focus ring (do not remove outline without a replacement) */
+.invite-code-submission-form-container input[type="text"]:focus-visible {
   border-color: #007bff;
-  box-shadow: 0 0 0 1px #007bff;
+  box-shadow: 0 0 0 2px #007bff;
 }
 
 /* Styling for the submit button */
@@ -188,7 +288,7 @@ const invite_code_css = `
   padding: 8px 16px;
   border: 1px solid #666;
   border-radius: 0 4px 4px 0; /* Rounds the right corners */
-  background-color: #777;
+  background-color: #666;
   color: white;
   font-size: 1rem;
   font-weight: 500;
@@ -203,9 +303,11 @@ const invite_code_css = `
 }
 
 /* Disabled state for the button */
-.invite-code-submission-form-container button:disabled {
+.invite-code-submission-form-container button:disabled,
+.invite-code-submission-form-container button[aria-disabled='true'] {
   background-color: #ccc;
   border-color: #bbb;
+  color: #333;
   cursor: not-allowed;
 }
 
@@ -229,7 +331,7 @@ const invite_code_css = `
 
 .or-separator {
   text-align: center;
-  color: #777;
+  color: #666;
   margin: 12px 0;
 }
 

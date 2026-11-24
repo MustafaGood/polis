@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { useAuth } from 'react-oidc-context'
 import { setOidcTokenGetter, setOidcActions } from '../util/net'
+import { getOidcApiToken } from '../util/oidcToken'
 
 const OidcConnector = () => {
   const auth = useAuth()
@@ -22,8 +23,12 @@ const OidcConnector = () => {
     if (process.env.AUTH_CLIENT_ID && auth.isAuthenticated && !auth.isLoading) {
       const tokenGetter = async () => {
         try {
-          // Check if we have a user object with token
-          if (auth.user?.access_token) {
+          const currentToken = getOidcApiToken(
+            auth.user,
+            process.env.AUTH_ISSUER
+          )
+
+          if (currentToken) {
             // Check if token is expired or about to expire
             const expiresAt = auth.user.expires_at
             const now = Math.floor(Date.now() / 1000)
@@ -33,8 +38,12 @@ const OidcConnector = () => {
               // Token is expired or about to expire, attempt silent refresh
               try {
                 const user = await auth.signinSilent()
-                if (user?.access_token) {
-                  return user.access_token
+                const refreshedToken = getOidcApiToken(
+                  user,
+                  process.env.AUTH_ISSUER
+                )
+                if (refreshedToken) {
+                  return refreshedToken
                 }
               } catch (silentError) {
                 // Token is stale and refresh failed - clear it
@@ -47,18 +56,26 @@ const OidcConnector = () => {
             }
 
             // Token is still valid
-            return auth.user.access_token
+            return currentToken
           }
 
           // If we don't have a token yet, try signinSilent to refresh
           const user = await auth.signinSilent()
-          if (user?.access_token) {
-            return user.access_token
+          const refreshedToken = getOidcApiToken(
+            user,
+            process.env.AUTH_ISSUER
+          )
+          if (refreshedToken) {
+            return refreshedToken
           }
 
           // Final check after signinSilent
-          if (auth.user?.access_token) {
-            return auth.user.access_token
+          const fallbackToken = getOidcApiToken(
+            auth.user,
+            process.env.AUTH_ISSUER
+          )
+          if (fallbackToken) {
+            return fallbackToken
           }
 
           return null

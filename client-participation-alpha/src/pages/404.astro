@@ -1,7 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import PolisLogo from '../components/icons/PolisLogo';
-import { getTranslations } from '../strings/strings';
+import { getDocumentLanguage, getTranslations } from '../strings/strings';
 import { uiLanguageSSR } from '../lib/lang'
 import Layout from './layouts/Layout.astro';
 
@@ -17,7 +17,7 @@ const lang = uiLanguageSSR(
 );
 ---
 
-<Layout title="Page Not Found" lang={lang || 'en'} dir={s.direction}>
+<Layout title="Page Not Found" lang={getDocumentLanguage(lang)} dir={s.direction}>
   <div class="container">
     <Header />
     

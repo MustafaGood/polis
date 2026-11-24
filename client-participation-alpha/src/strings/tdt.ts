@@ -37,7 +37,7 @@ s.commentSent =
   "Komentáriu ne'ebe submete ona! Partisipante sira seluk de'it mak bele haree Ita-boot nia deklarasaun no sei konkorda ka lae."
 s.helpWriteListIntro = "Deklarasaun di'ak mak oinsa?"
 s.helpWriteListRaisNew = "Hasa'e hanoin, partisipasaun ka assuntu foun"
-s.helpWriteListShort = "Klaru (mós) no badak (limite to'o letra 140 de'it)"
+s.helpWriteListShort = "Klaru (mós) no badak (limite to'o letra 400 de'it)"
 s.helpWriteListStandalone = "Ideia autonómu (rasik)"
 s.submitComment = "Tuma"
 s.writePrompt = "Fahe o nia hanoin.."

@@ -37,6 +37,10 @@ If you're interested in using or contributing to Polis, please see the following
 
 If you're trying to set up a Polis deployment or development environment, then please read the rest of this document 👇 ⬇️ 👇
 
+For the LIA accessibility work, see the [accessibility guide](./ACCESSIBILITY.md),
+[assessment status](./WCAG-COMPLIANCE.md), [development and test instructions](./DEVELOPMENT.md),
+and [test report](./TEST-REPORT.md).
+
 ---
 
 ## ⚡ Running Polis

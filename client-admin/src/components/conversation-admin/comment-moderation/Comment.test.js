@@ -100,7 +100,7 @@ describe('Comment', () => {
 
   it('shows metadata checkbox when isMetaCheckbox is true', () => {
     renderWithProviders(<Comment {...defaultProps} />)
-    const checkbox = screen.getByRole('checkbox')
+    const checkbox = screen.getByRole('checkbox', { name: 'metadata' })
     expect(checkbox).toBeInTheDocument()
     expect(screen.getByText('metadata')).toBeInTheDocument()
   })

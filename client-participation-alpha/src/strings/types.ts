@@ -55,9 +55,29 @@ export interface Translations {
   notificationsGetNotified: string
   notificationsSubscribeButton: string
   notificationsSubscribeErrorGeneric: string
+  oidcSignIn: string
+  oidcSignOut: string
+  oidcSignedInAs: string
+  oidcLoginCanceled: string
+  oidcTryAgain: string
+  oidcLoginFailed: string
+  oidcLoginFrejaUnavailable: string
+  eidRequired: string
   ok_got_it: string
   oops: string
   opinionGroups: string
+  pcaTextDescription: string
+  pcaAxesDescription: string
+  pcaGroupDescription: string
+  pcaGroupCoordinates: string
+  pcaPolygonDescription: string
+  pcaLineDescription: string
+  pcaNoShapeDescription: string
+  pcaOutlineCoordinates: string
+  pcaPointCoordinates: string
+  pcaUserPositionDescription: string
+  pcaUserPositionUnavailable: string
+  pcaCoordinateUnavailable: string
   or_text: string
   participantHelpWelcomeText: string
   pass: string
@@ -79,6 +99,7 @@ export interface Translations {
   topicSelectionsSavedSuccess: string
   TOS: string
   voteFailedGeneric: string
+  voteSubmitted: string
   writeCommentHelpText: string
   writePrompt: string
   x_wrote: string

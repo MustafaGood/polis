@@ -10,6 +10,7 @@ import { isXidAllowed } from "../xids";
 import { joinConversation } from "../participant";
 import { userHasAnsweredZeQuestions } from "../server-helpers";
 import type { ParticipantInfo } from "../d";
+import { assertEidRequired, getRequestEidAcr } from "./eid";
 
 interface DeregisterRequest {
   p?: { showPage?: any };
@@ -29,6 +30,9 @@ interface JoinRequest {
     zid: number;
     referrer: string;
     parent_url: string;
+    oidcUser?: { acr?: unknown };
+    eidAcr?: string;
+    jwt_conversation_mismatch?: boolean;
   };
 }
 
@@ -90,6 +94,9 @@ async function handle_POST_joinWithInvite(
       zid: req.p.zid,
       referrer: req.p.referrer,
       parent_url: req.p.parent_url,
+      oidcUser: req.p.oidcUser,
+      eidAcr: req.p.eidAcr,
+      jwtConversationMismatch: req.p.jwt_conversation_mismatch,
     });
 
     const response: any = {
@@ -116,6 +123,8 @@ async function handle_POST_joinWithInvite(
       failJson(res, 403, err.message, err);
     } else if (err?.message?.match(/polis_err_xid_not_allowed/)) {
       failJson(res, 403, err.message, err);
+    } else if (err?.message?.match(/polis_err_eid_required/)) {
+      failJson(res, 403, err.message, err);
     } else if (err?.message) {
       failJson(res, 500, err.message, err);
     } else {
@@ -138,6 +147,12 @@ async function _joinWithZidOrSuzinvite(params: JoinParams): Promise<any> {
   // Get conversation info
   const conv = await getConversationInfo(o.zid);
   o.conv = conv;
+  const eidAcr = getRequestEidAcr(
+    o.oidcUser?.acr,
+    o.eidAcr,
+    !!o.jwtConversationMismatch
+  );
+  assertEidRequired(!!conv.eid_required, eidAcr);
 
   // Get user info if uid exists
   if (o.uid) {

@@ -43,7 +43,7 @@ s.commentSent =
   "Statement wurde gesendet! Die anderen TeilnehmerInnen werden benachrichtigt und können über Ihr Statement abstimmen."
 s.helpWriteListIntro = "Was macht ein gutes Statement aus?"
 s.helpWriteListRaisNew = "Bringen Sie neue Perspektiven, Erfahrungen und Probleme ein"
-s.helpWriteListShort = "Knapp und präzise formuliert (maximal 140 Zeichen)"
+s.helpWriteListShort = "Knapp und präzise formuliert (maximal 400 Zeichen)"
 s.helpWriteListStandalone = "Eine unabhängige Idee"
 s.submitComment = "Einreichen"
 s.tipCommentsRandom =

@@ -63,7 +63,7 @@ const Comment = ({
             {isMetaCheckbox ? (
               <input
                 type="checkbox"
-                label="metadata"
+                aria-label="metadata"
                 ref={isMetaRef}
                 checked={comment.is_meta}
                 onChange={onIsMetaClicked}

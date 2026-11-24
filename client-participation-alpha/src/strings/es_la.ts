@@ -43,15 +43,15 @@ s.commentSent =
   "Afirmación enviada. Solo otros participantes verán tu afirmación e indicarán si están de acuerdo o en desacuerdo."
 s.helpWriteListIntro = "¿Qué hace que una afirmación se considere buena?"
 s.helpWriteListRaisNew = "Plantea una perspectiva, una experiencia o un problema nuevos"
-s.helpWriteListShort = "Tiene una redacción clara y concisa (límite de 140 caracteres)"
+s.helpWriteListShort = "Tiene una redacción clara y concisa (límite de 400 caracteres)"
 s.helpWriteListStandalone = "Plantea una idea concreta"
 s.submitComment = "Enviar"
 s.tipCommentsRandom =
-  "Las afirmaciones se muestran en orden aleatorio, así que no son una respuesta directa a las afirmaciones de otras personas, sino <b> una afirmación independiente.<b>"
+  "Las afirmaciones se muestran en orden aleatorio, así que no son una respuesta directa a las afirmaciones de otras personas, sino <b>una afirmación independiente.</b>"
 s.writePrompt =
   "Comparte tu punto de vista (no se trata de una respuesta; debes aportar una afirmación independiente)"
 s.writeCommentHelpText =
-  "¿Tus perspectivas o experiencias no están recogidas en la conversación? En ese caso,</b> añádelas de una en una </b> en el cuadro de abajo</b></b>."
+  "¿Tus perspectivas o experiencias no están recogidas en la conversación? En ese caso, <b>añádelas de una en una</b> en el cuadro de abajo."
 
 // ─────────────────────────────────────────────────────────────
 // Visualization

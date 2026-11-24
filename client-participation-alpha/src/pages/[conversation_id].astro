@@ -10,10 +10,11 @@ import TopicAgenda from '../components/topicAgenda/TopicAgenda'
 import TreeviteInvites from '../components/TreeviteInvites'
 import TreeviteLoginCodeModal from '../components/TreeviteLoginCodeModal'
 import VisualizationContainer from '../components/VisualizationContainer'
+import OidcAuthIsland from '../components/OidcAuthIsland'
 import XidOidcConflictWarning from '../components/XidOidcConflictWarning'
 import PolisLogo from '../components/icons/PolisLogo'
 import Layout from '../pages/layouts/Layout.astro'
-import { getTranslations } from '../strings/strings'
+import { getDocumentLanguage, getTranslations } from '../strings/strings'
 import type { Translations } from '../strings/types'
 import { uiLanguageSSR } from '../lib/lang'
 
@@ -83,6 +84,8 @@ try {
   // Handle specific error cases
   if (errorResponseText.includes('polis_err_xid_required')) {
     fetchError = s.xidRequired
+  } else if (errorResponseText.includes('polis_err_eid_required')) {
+    fetchError = s.eidRequired
   } else {
     fetchError = s.couldNotLoadConversation.replace('{{error}}', errorMessage)
   }
@@ -114,7 +117,7 @@ const hideHeader = Astro.url.searchParams.get('hide_header');
 ---
 <Layout
   title={surveyDetails?.title ?? 'Loading Conversation...'}
-  lang={pageLang || 'en'}
+  lang={getDocumentLanguage(pageLang)}
   dir={s.direction}
 >
   {/* Handle JWT token from initial data on client side - MUST be synchronous to avoid race conditions */}
@@ -149,6 +152,7 @@ const hideHeader = Astro.url.searchParams.get('hide_header');
   <div class="container">
     {hideHeader ? null : <Header />}
     
+    <OidcAuthIsland client:only="react" s={s as Translations} />
     <XidOidcConflictWarning client:load s={s as Translations} />
 
     {fetchError ? (

@@ -8,6 +8,12 @@
 # For more information see https://docs.docker.com/compose/extends/
 
 services:
+  # SSR in alpha must call the API on the compose network. host.docker.internal:5000
+  # hairpins through Windows Docker and often exceeds the 10s fetch timeout.
+  client-participation-alpha:
+    environment:
+      - INTERNAL_SERVICE_URL=http://server:5000/api/v3
+
   server:
     build:
       target: dev

@@ -157,6 +157,11 @@ function normalizeLanguageCode(langCode: string | null | undefined): string | nu
   return null
 }
 
+export function getDocumentLanguage(langCode: string | null | undefined): string {
+  const normalized = normalizeLanguageCode(langCode)
+  return normalized && translationModules[normalized] && langCode ? langCode : "en"
+}
+
 /**
  * Determines the best available translation module key based on user's preferred languages.
  * Uses uiLanguage() functions to detect the language, then normalizes it to a translation module key.

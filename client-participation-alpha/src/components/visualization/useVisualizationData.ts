@@ -104,7 +104,20 @@ export function useVisualizationData(
         : undefined
 
       const hull = calculateConcaveHull(points, CONCAVITY, LENGTH_THRESHOLD)
-      return { groupId: groupCluster.id, hull, points, participantCount, center }
+      const outline = hull ?? (points.length === 2 ? points : [])
+      const outlineCoordinates = outline.map(([x, y]): [number, number] => {
+        const index = points.findIndex(([pointX, pointY]) => pointX === x && pointY === y)
+        if (index === -1) throw new Error('Hull vertex does not match a group point')
+        return [groupBaseClusters[index].x, groupBaseClusters[index].y]
+      })
+      return {
+        groupId: groupCluster.id,
+        hull,
+        points,
+        outlineCoordinates,
+        participantCount,
+        center
+      }
     })
   }, [data, baseClusters, xScale, yScale])
 
@@ -203,7 +216,7 @@ export function useVisualizationData(
 
   // Extract vote data for each group for the selected statement
   const groupVoteData: GroupVoteInfo[] = useMemo(() => {
-    if (!selectedStatementTid || !data['group-votes']) return []
+    if (selectedStatementTid === null || !data['group-votes']) return []
 
     const tidString = selectedStatementTid.toString()
     const voteData: GroupVoteInfo[] = []

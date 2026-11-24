@@ -224,10 +224,11 @@ describe('Client Admin: Conversation Management', () => {
       // Look for seed comments section
       cy.contains('Seed Comments').should('exist')
 
+      const testRunId = Date.now()
       const testComments = [
-        'Should we implement this feature?',
-        'This could have environmental benefits',
-        'Cost considerations need to be evaluated',
+        `Should we implement this feature? ${testRunId}`,
+        `This could have environmental benefits ${testRunId}`,
+        `Cost considerations need to be evaluated ${testRunId}`,
       ]
 
       // Set up API intercept for comment submissions

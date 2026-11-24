@@ -40,13 +40,13 @@ s.commentSent =
   "Kommentar sendt! Andre deltagere kan se din kommentar og være enig eller uenig i den."
 s.helpWriteListIntro = "Hvad er en god kommentar?"
 s.helpWriteListRaisNew = "Rejser nye perspektiver, erfaringer eller problemstillinger"
-s.helpWriteListShort = "Klar og præcis (begrænset til 140 tegn)"
+s.helpWriteListShort = "Klar og præcis (begrænset til 400 tegn)"
 s.helpWriteListStandalone = "Enkeltstående idé"
 s.submitComment = "Indsend"
 s.tipCommentsRandom = "Kommentarer vises tilfældigt. Du svarer ikke direkte til nogen."
 s.writePrompt = "Del dit perspektiv..."
 s.writeCommentHelpText =
-  "Hvis dit perspektiv ikke er repræsenteret, så <strong>skriv</strong> en kommentar!</i>"
+  "Hvis dit perspektiv ikke er repræsenteret, så <strong>skriv</strong> en kommentar!"
 
 // ─────────────────────────────────────────────────────────────
 // Visualization

@@ -42,14 +42,14 @@ s.commentSent =
   "Izjava je poslana! Vašu izjavu će vidjeti i s njom će se moći složiti ili ne složiti samo drugi učesnici."
 s.helpWriteListIntro = "Šta čini dobru izjavu?"
 s.helpWriteListRaisNew = "Novi pogled na stvari, iskustvo ili problem"
-s.helpWriteListShort = "Jasna i sažeta formulacija (najviše 140 znakova)"
+s.helpWriteListShort = "Jasna i sažeta formulacija (najviše 400 znakova)"
 s.helpWriteListStandalone = "Jedna ideja"
 s.submitComment = "Pošalji"
 s.tipCommentsRandom =
-  "Izjave se prikazuju nasumično i ne odgovarate direktno na izjave drugih osoba: <b> dodajete samostalnu izjavu.<b>"
+  "Izjave se prikazuju nasumično i ne odgovarate direktno na izjave drugih osoba: <b>dodajete samostalnu izjavu.</b>"
 s.writePrompt = "Podijelite mišljenje (ne dajete odgovor, nego samostalnu izjavu)"
 s.writeCommentHelpText =
-  "Nedostaju li u razgovoru vaši stavovi ili iskustva? Ako nedostaju,</b>dodajte ih </b> u okvir u nastavku — </b>pojedinačno</b>."
+  "Nedostaju li u razgovoru vaši stavovi ili iskustva? Ako nedostaju, <b>dodajte ih</b> u okvir u nastavku <b>pojedinačno</b>."
 
 // ─────────────────────────────────────────────────────────────
 // Visualization

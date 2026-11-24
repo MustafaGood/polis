@@ -50,6 +50,19 @@ describe("Standard User JWT", () => {
       const expirationTime = decoded.exp - decoded.iat;
       expect(expirationTime).toBe(365 * 24 * 60 * 60); // 1 year in seconds
     });
+
+    it("preserves verified eID assurance in the participant token", () => {
+      const eidAcr = "urn:grn:authn:se:bankid:same-device";
+      const token = issueStandardUserJWT(
+        mockOidcSub,
+        mockConversationId,
+        mockUid,
+        mockPid,
+        eidAcr
+      );
+
+      expect((jwt.decode(token) as any).eid_acr).toBe(eidAcr);
+    });
   });
 
   describe("isStandardUserJWT", () => {

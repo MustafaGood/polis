@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { fetchNextComment } from '../api/comments'
 import { submitVote } from '../api/votes'
 import { getConversationToken } from '../lib/auth'
@@ -54,7 +54,12 @@ export default function Survey({
   const [isFetchingNext, setIsFetchingNext] = useState<boolean>(false)
   const [isStatementImportant, setIsStatmentImportant] = useState<boolean>(false)
   const [voteError, setVoteError] = useState<string | null>(null)
+  const [feedback, setFeedback] = useState<string>('')
   const [inviteGate, setInviteGate] = useState<boolean>(requiresInviteCode)
+  const inviteGateRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const restoreFocus = useRef(false)
+  const voteFocusRef = useRef<HTMLButtonElement | null>(null)
 
   // On hydration, fetch a participant-personalized next comment.
   // This replaces the SSR-provided generic comment if needed.
@@ -120,19 +125,65 @@ export default function Survey({
       setInviteGate(requiresInviteCode)
     }
 
-    const onInviteAccepted = () => setInviteGate(false)
-    const onLoginSuccess = () => setInviteGate(false)
+    const openParticipation = () => {
+      restoreFocus.current = !!inviteGateRef.current?.contains(document.activeElement)
+      setInviteGate(false)
+    }
+    const onInviteAccepted = (event: Event) => {
+      if (!(event instanceof CustomEvent && event.detail?.hasLoginCode)) {
+        setFeedback(s.invite_code_accepted_message_no_code)
+      }
+      openParticipation()
+    }
+    const onLoginSuccess = () => {
+      setFeedback(s.login_success)
+      openParticipation()
+    }
     window.addEventListener('invite-code-submitted', onInviteAccepted)
     window.addEventListener('login-code-submitted', onLoginSuccess)
+
     return () => {
       window.removeEventListener('invite-code-submitted', onInviteAccepted)
       window.removeEventListener('login-code-submitted', onLoginSuccess)
     }
-  }, [conversation_id, requiresInviteCode])
+  }, [conversation_id, requiresInviteCode, s.invite_code_accepted_message_no_code, s.login_success])
+
+  useEffect(() => {
+    if (!inviteGate && restoreFocus.current) {
+      restoreFocus.current = false
+      if (document.activeElement === document.body) contentRef.current?.focus()
+    }
+  }, [inviteGate])
+
+  useEffect(() => {
+    if (isFetchingNext || !voteFocusRef.current) return
+
+    const voteButton = voteFocusRef.current
+    voteFocusRef.current = null
+    if (document.activeElement !== document.body) return
+
+    if (voteButton.isConnected && !voteButton.disabled) {
+      voteButton.focus()
+    } else {
+      const emailInput =
+        contentRef.current?.querySelector<HTMLInputElement>('#email-subscribe-input')
+      if (emailInput) emailInput.focus()
+      else contentRef.current?.focus()
+    }
+  }, [isFetchingNext, statement])
 
   const handleVote = async (voteType: number, tid: number | string) => {
+    const activeElement = document.activeElement
+    if (
+      activeElement instanceof HTMLButtonElement &&
+      contentRef.current?.contains(activeElement) &&
+      activeElement.dataset.testid?.startsWith('vote-')
+    ) {
+      voteFocusRef.current = activeElement
+    }
     setIsFetchingNext(true)
     setVoteError(null)
+    setFeedback('')
 
     try {
       const vote: VoteData = { vote: voteType, tid: tid }
@@ -143,6 +194,7 @@ export default function Survey({
       )
 
       setVoteError(null)
+      setFeedback(s.voteSubmitted)
       if (result?.nextComment) {
         setStatement(result.nextComment)
       } else {
@@ -165,33 +217,43 @@ export default function Survey({
         errorMessage = s.xidRequired
       } else if (errorText.includes('polis_err_xid_required')) {
         errorMessage = s.xidRequired
+      } else if (errorText.includes('polis_err_eid_required')) {
+        errorMessage = s.eidRequired
       }
 
       setVoteError(errorMessage)
+      setFeedback('')
     } finally {
       setIsFetchingNext(false)
     }
   }
 
-  if (inviteGate) {
-    return <InviteCodeSubmissionForm s={s as Translations} conversation_id={conversation_id} />
-  }
-
   return (
     <>
-      {statement ? (
-        <Statement
-          statement={statement}
-          onVote={handleVote}
-          isVoting={isFetchingNext}
-          s={s as Translations}
-          isStatementImportant={isStatementImportant}
-          setIsStatmentImportant={setIsStatmentImportant}
-          voteError={voteError}
-          importanceEnabled={importanceEnabled}
-        />
+      <p role="status" style={feedback ? undefined : { margin: 0 }}>
+        {feedback}
+      </p>
+      {inviteGate ? (
+        <div ref={inviteGateRef}>
+          <InviteCodeSubmissionForm s={s as Translations} conversation_id={conversation_id} />
+        </div>
       ) : (
-        <EmailSubscribeForm s={s as Translations} conversation_id={conversation_id} />
+        <div ref={contentRef} tabIndex={-1} data-participation-content>
+          {statement ? (
+            <Statement
+              statement={statement}
+              onVote={handleVote}
+              isVoting={isFetchingNext}
+              s={s as Translations}
+              isStatementImportant={isStatementImportant}
+              setIsStatmentImportant={setIsStatmentImportant}
+              voteError={voteError}
+              importanceEnabled={importanceEnabled}
+            />
+          ) : (
+            <EmailSubscribeForm s={s as Translations} conversation_id={conversation_id} />
+          )}
+        </div>
       )}
     </>
   )

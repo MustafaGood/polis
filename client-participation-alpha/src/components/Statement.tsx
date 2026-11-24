@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useId, useState } from 'react'
 import { uiLanguage } from '../lib/lang'
 import type { Translations } from '../strings/types'
 import InfoIcon from './icons/InfoIcon'
@@ -27,6 +27,7 @@ export function Statement({
 }: StatementProps) {
   const [showImportanceDesc, setShowImportanceDesc] = useState<boolean>(false)
   const [translationsEnabled, setTranslationsEnabled] = useState<boolean>(false)
+  const importanceCheckboxId = useId()
 
   // Get current user language
   const currentLang = uiLanguage()
@@ -86,11 +87,7 @@ export function Statement({
             {s.anonPerson} {s.x_wrote}
           </span>
         </div>
-        {remainingText && (
-          <span className="statement-remaining">
-            {remainingText}
-          </span>
-        )}
+        {remainingText && <span className="statement-remaining">{remainingText}</span>}
       </div>
 
       {/* Show official translation (replaces original) or original text */}
@@ -166,9 +163,9 @@ export function Statement({
       {importanceEnabled ? (
         <>
           <div className="importance-container">
-            <label htmlFor="important">{s.importantCheckbox}</label>
+            <label htmlFor={importanceCheckboxId}>{s.importantCheckbox}</label>
             <input
-              id="important"
+              id={importanceCheckboxId}
               type="checkbox"
               onChange={() => setIsStatmentImportant((prev) => !prev)}
               checked={isStatementImportant}
@@ -214,7 +211,11 @@ export function Statement({
           {isVoting ? '' : passUnsureText}
         </button>
       </div>
-      {voteError && <p className="vote-error">{voteError}</p>}
+      {voteError && (
+        <p className="vote-error" role="alert">
+          {voteError}
+        </p>
+      )}
     </div>
   )
 }

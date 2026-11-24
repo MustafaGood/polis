@@ -1,19 +1,28 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import type { Translations } from '../strings/types'
 
 interface TreeviteLoginCodeModalProps {
   s: Translations
 }
 
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
 export default function TreeviteLoginCodeModal({ s }: TreeviteLoginCodeModalProps) {
   const [visible, setVisible] = useState<boolean>(false)
   const [loginCode, setLoginCode] = useState<string>('')
   const [copied, setCopied] = useState<boolean>(false)
+  const [copyError, setCopyError] = useState<string>('')
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null)
+  const titleId = useId()
+  const descriptionId = useId()
 
   useEffect(() => {
     const onIssued = (e: CustomEventInit) => {
       const code = e?.detail?.login_code
       if (code) {
+        previouslyFocusedRef.current = document.activeElement as HTMLElement | null
         setLoginCode(code)
         setVisible(true)
       }
@@ -22,40 +31,118 @@ export default function TreeviteLoginCodeModal({ s }: TreeviteLoginCodeModalProp
     return () => window.removeEventListener('treevite-login-code-issued', onIssued as EventListener)
   }, [])
 
-  const close = () => setVisible(false)
+  const close = useCallback(() => {
+    setVisible(false)
+    setCopied(false)
+    setCopyError('')
+    requestAnimationFrame(() => {
+      const active = document.activeElement
+      if (active === document.body || dialogRef.current?.contains(active)) {
+        const previous = previouslyFocusedRef.current
+        if (previous?.isConnected && previous !== document.body) previous.focus()
+        if (document.activeElement === document.body || document.activeElement !== previous) {
+          document.querySelector<HTMLElement>('[data-participation-content]')?.focus()
+        }
+      }
+      previouslyFocusedRef.current = null
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!visible) return
+
+    const dialog = dialogRef.current
+    if (!dialog) return
+
+    const focusables = () =>
+      Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+        (el) => !el.hasAttribute('disabled') && el.tabIndex !== -1
+      )
+
+    const nodes = focusables()
+    const primary = dialog.querySelector<HTMLElement>('.tv-primary')
+    ;(primary || nodes[0])?.focus()
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        close()
+        return
+      }
+
+      if (e.key !== 'Tab') return
+
+      const items = focusables()
+      if (items.length === 0) {
+        e.preventDefault()
+        return
+      }
+
+      const first = items[0]
+      const last = items[items.length - 1]
+      const active = document.activeElement as HTMLElement | null
+
+      if (e.shiftKey) {
+        if (active === first || !dialog.contains(active)) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else if (active === last || !dialog.contains(active)) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [visible, close])
 
   if (!visible) return null
 
   const message = s.invite_code_accepted_message.replace('{{login_code}}', loginCode)
 
   const copyToClipboard = async () => {
+    if (copied) return
+    setCopyError('')
     try {
       await navigator.clipboard.writeText(loginCode)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch {
-      // ignore
+    } catch (error) {
+      console.error('Copying the login code failed:', error)
+      setCopyError(`${s.error}. ${s.oidcTryAgain}`)
     }
   }
 
   return (
-    <div className="tv-modal-overlay" role="dialog" aria-modal="true">
+    <div
+      ref={dialogRef}
+      className="tv-modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
+    >
       <style>{styles}</style>
       <div className="tv-modal">
-        <h3>{s.invite_code_required_short}</h3>
-        <p style={{ whiteSpace: 'pre-wrap' }}>{message}</p>
+        <h3 id={titleId}>{s.invite_code_required_short}</h3>
+        <p id={descriptionId} style={{ whiteSpace: 'pre-wrap' }}>
+          {message}
+        </p>
         <div className="tv-code-box">
           <code>{loginCode}</code>
           <button
+            type="button"
             className={`tv-copy${copied ? ' copied' : ''}`}
             onClick={copyToClipboard}
-            disabled={copied}
+            aria-disabled={copied || undefined}
           >
             {copied ? s.copied : s.copy}
           </button>
         </div>
+        {copyError && <p role="alert">{copyError}</p>}
         <div className="tv-actions">
-          <button className="tv-primary" onClick={close}>
+          <button type="button" className="tv-primary" onClick={close}>
             {s.ok_got_it}
           </button>
         </div>

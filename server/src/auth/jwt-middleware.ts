@@ -109,14 +109,6 @@ const extractUserFromJWT = (
                 "Authentication system is experiencing high load. Please try again in a moment.",
               retry_after: 1, // Suggest retry after 1 second
             });
-          } else if (
-            userCreationError.message?.includes("OIDC user missing email")
-          ) {
-            // Missing required user data
-            return res.status(400).json({
-              error: "invalid_user_data",
-              message: "User account is missing required information (email).",
-            });
           } else if (userCreationError.code === "23505") {
             // Database constraint violation - likely a race condition that wasn't handled
             logger.warn("Unhandled constraint violation in JWT middleware:", {

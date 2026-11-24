@@ -40,7 +40,7 @@ s.commentSent =
   "Afirmația a fost trimisă! Doar alți participanți o vor putea vedea și vota de acord sau nu sunt de acord"
 s.helpWriteListIntro = "Cum să scrii un comentariu bun?"
 s.helpWriteListRaisNew = "Abordează viziuni, experiențe sau probleme noi"
-s.helpWriteListShort = "Scrie clar și concis (până la 140 caractere)"
+s.helpWriteListShort = "Scrie clar și concis (până la 400 caractere)"
 s.helpWriteListStandalone = "Notează o singură idee"
 s.submitComment = "Trimite"
 s.tipCommentsRandom =

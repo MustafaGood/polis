@@ -11,6 +11,7 @@ export interface Hull {
   groupId: number
   hull: [number, number][] | null
   points: [number, number][]
+  outlineCoordinates: [number, number][]
   participantCount: number
   center?: [number, number]
 }

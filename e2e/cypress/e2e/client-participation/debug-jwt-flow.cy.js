@@ -3,20 +3,28 @@
  * This test includes extensive logging to identify why JWT isn't being received
  */
 
-import { setupTestConversation } from '../../support/conversation-helpers.js'
+import { loginStandardUserAPI } from '../../support/auth-helpers.js'
+import {
+  addCommentsToConversationNoAuth,
+  createTestConversationAPI,
+} from '../../support/conversation-helpers.js'
 
 describe('Debug Anonymous JWT Flow', function () {
   let conversationId
 
   before(function () {
-    setupTestConversation({
-      topic: 'Debug JWT Flow',
-      description: 'Debug test for JWT',
-      comments: ['Test comment 1', 'Test comment 2'],
-    }).then((result) => {
-      conversationId = result.conversationId
-      cy.log(`✅ Test conversation created: ${conversationId}`)
-    })
+    loginStandardUserAPI('moderator@polis.test', 'Te$tP@ssw0rd*')
+      .then(() =>
+        createTestConversationAPI({
+          topic: `Debug JWT Flow ${Date.now()}`,
+          description: 'Debug test for JWT',
+        }),
+      )
+      .then((id) => {
+        conversationId = id
+        return addCommentsToConversationNoAuth(id, ['Test comment 1', 'Test comment 2'])
+      })
+      .then(() => cy.log(`✅ Test conversation created: ${conversationId}`))
   })
 
   it('debug JWT flow step by step', function () {

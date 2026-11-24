@@ -35,7 +35,7 @@ s.commentSent =
   "Declaração submetida! Apenas os outros participantes que vão ver a sua declaração e se vai concordar ou discordar."
 s.helpWriteListIntro = "O que é uma boa declaração?"
 s.helpWriteListRaisNew = "Levantar as novas perspectivas, experiências ou questões"
-s.helpWriteListShort = "Claro e conciso (limitado a 140 caracteres)"
+s.helpWriteListShort = "Claro e conciso (limitado a 400 caracteres)"
 s.helpWriteListStandalone = "Ideia autônoma"
 s.writePrompt = "Compartilhe a sua perspetiva.."
 s.writeCommentHelpText =
